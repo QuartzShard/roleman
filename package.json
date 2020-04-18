@@ -1,0 +1,22 @@
+{
+  "name": "roleman",
+  "version": "1.0.0",
+  "description": "A Role Management Bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/QuartzShard/roleman.git"
+  },
+  "keywords": [
+    "discord"
+  ],
+  "author": "QuartzShard#5309",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/QuartzShard/roleman/issues"
+  },
+  "homepage": "https://github.com/QuartzShard/roleman#readme"
+}
