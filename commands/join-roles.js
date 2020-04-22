@@ -1,23 +1,30 @@
 const db = require('../db/db')
 const conf = db.get('conf')
-const {getRoleIDFromMention} = require('../common')
+const {getRoleIDFromMention, resolveRoleFromID,resolveMemberFromID, embedify} = require('../common')
 
 module.exports = {
     name: 'join-roles',
-    aliases:['join-role'],
+    aliases:['join-role','joinrole','joinroles'],
 	description: 'Configure roles for the bot to add to new members',
 	usage: '<@role> || [<@role>,..]',
     cooldown: 10,
     args:true,
     async execute(msg, args){
+        const member = await resolveMemberFromID(msg.author.id, msg.guild)
+        if(!member.hasPermission("MANAGE_ROLES")) return msg.reply(embedify("Sorry, but you don't have permission do that."))
         var roles = []
         var displayRoles = []
         for (const arg of args) {
-            const roleData = await getRoleIDFromMention(msg, arg)
+            const roleData = await getRoleIDFromMention(arg)
             displayRoles.push(roleData[0])
             roles.push(roleData [1])
         }
         if (roles.length == 0) return msg.channel.send("> No valid roles were specified")
+
+        const resolvedRoles = await resolveRoleFromID(roles,msg.guild)
+        for (const role of resolvedRoles) {
+            if (role.comparePositionTo(member.roles.highest) > 0) return msg.reply(embedify("Sorry, but you don't have permission do that."))
+        }
         var guildConf = await conf.findOne({guildID:msg.guild.id})
         guildConf.joinRoles = roles
         guildConf.save()
