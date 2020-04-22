@@ -13,6 +13,7 @@ module.exports = {
             	const command = requireUncached(`../commands/${file}`);
             	msg.client.commands.set(command.name, command);
             }
+            msg.channel.send("Reloaded all commands")
         } else {
             const command = msg.client.commands.get(commandName)
                 || msg.client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
