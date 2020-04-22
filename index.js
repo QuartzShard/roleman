@@ -1,7 +1,8 @@
 require('dotenv').config()
 const fs = require('fs');
 const Discord = require('discord.js');
-const {prefix} = require("./config.json")
+const db = require('./db/db')
+const {defaultPrefix} = require("./config.json")
 
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
@@ -19,7 +20,22 @@ client.once('ready', () => {
 	console.log('Ready!');
 });
 
-client.on("message", (msg) => {
+client.on('guildCreate', async (guild) => {
+    const conf = db.get("conf")
+    if (! await db.get('conf').findOne({guildID:guild.id})) {
+        const doc = new conf({guildID:guild.id,prefix:defaultPrefix})
+        doc.save().then(()=>console.log("New server registered! " + guild.name)).catch(err=>console.log(err))
+    }
+})
+client.on("guildDelete", async (guild)=>{
+    const conf = db.get("conf")
+    conf.remove({guildID:guild.id}).then(()=>console.log("Bot removed from " + guild.name)).catch(err=>console.log(err))
+})
+
+client.on("message", async (msg) => {
+    const conf = db.get("conf")
+    const doc = await conf.findOne({guildID:msg.guild.id})
+    const prefix = doc.prefix
     if (!msg.content.startsWith(prefix) || msg.author.bot || msg.channel.type === "dm") {
         return 
     };

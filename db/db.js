@@ -17,4 +17,3 @@ for (const file of modelFiles) {
 
 module.exports = db
 
-console.log(db.get("conf"))

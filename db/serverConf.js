@@ -1,21 +1,21 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-const confSchema = new Schema(
-    {
-        prefix: {
-            type:String,
-            required:true,
-        }
-    }
-)
 module.exports = {
     name:"conf",
-    schema:confSchema
+    schema:
+    new Schema(
+        {
+            guildID:{
+                type:String,
+                required:true,
+            },
+            prefix: {
+                type:String,
+                required:true,
+            }
+        }),
 }
 
 
-const testFunc = function() {
-    console.log("test")
-}
-module.exports.testFunc = testFunc
+

@@ -1,14 +1,16 @@
-const { prefix } = require('../config.json');
-
+const db = require('../db/db')
+const conf = db.get('conf')
 module.exports = {
 	name: 'help',
 	description: 'List all commands, or info about a specific command.',
 	aliases: ['commands','explainYourselfRoleMan'],
 	usage: '[command name]',
 	cooldown: 5,
-	execute(msg, args) {
+	async execute(msg, args) {
 		const data = [];
 		const { commands } = msg.client;
+        const doc = await conf.findOne({guildID:msg.guild.id})
+        const prefix = doc.prefix
 
 		if (!args.length) {
 			data.push('Here\'s a list of all available commands:');
