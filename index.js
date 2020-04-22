@@ -4,6 +4,7 @@ const Discord = require('discord.js');
 const db = require('./db/db')
 const conf = db.get("conf")
 const {defaultPrefix} = require("./config.json")
+const {resolveRoleFromID, embedify} = require("./common")
 
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
@@ -27,9 +28,10 @@ client.on('guildCreate', async (guild) => {
         doc.save().then(()=>console.log("New server registered! " + guild.name)).catch(err=>console.log(err))
     }
     if (guild.systemChannel){
-        guild.systemChannel.send("Thanks for adding this bot! The default prefix is `rm!`, try `rm!help` to get started.")
+        guild.systemChannel.send(embedify("Thanks for adding this bot! The default prefix is `rm!`, try `rm!help` to get started."))
     } else {
-        guild.channels.cache.filter(c=>c.type=="text").array()[0].send("Thanks for adding this bot! The default prefix is `rm!`, try `rm!help` to get started.")
+        guild.channels.cache.filter(c=>c.type=="text").array()[0]
+        .send(embedify("Thanks for adding this bot! The default prefix is `rm!`, try `rm!help` to get started."))
     }
 })
 client.on("guildDelete", async (guild)=>{
@@ -40,9 +42,9 @@ client.on("guildMemberAdd", async (member)=>{
     const guild = member.guild
     const guildConf = await conf.findOne({guildID:guild.id})
     if (guildConf.joinRoles) {
-        for (const role of guildConf.joinRoles) {
-            const resolvedRole = await guild.roles.fetch(role)
-            member.roles.add(resolvedRole)
+        const roles = await resolveRoleFromID(guildConf.joinRoles,guild) 
+        for (const role of roles) {
+            member.roles.add(role)
         }
     }
 })
@@ -59,15 +61,15 @@ client.on("message", async (msg) => {
     var command = client.commands.get(commandName) || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
     
     if(!command) {
-        return msg.reply(`Command not recognised, try \`${prefix}help\`.`)
+        return msg.reply(embedify(`Command not recognised, try \`${prefix}help\`.`))
     }
 
     if (command.args && !args.length) {
-		let reply = `You didn't provide any arguments, ${msg.author}!`;
+		let reply = [`You didn't provide any arguments, and this command expects some`];
 		if (command.usage) {
-			reply += `\nThe proper usage would be: \`${prefix}${command.name} ${command.usage}\``;
+			reply.push(`The proper usage would be: \`${prefix}${command.name} ${command.usage}\``);
 		}
-		return msg.reply(reply);
+		return msg.reply(embedify(reply.shift(),reply));
     }
     
     if (!cooldowns.has(command.name)) {
@@ -80,7 +82,7 @@ client.on("message", async (msg) => {
 		const expirationTime = timestamps.get(msg.author.id) + cooldownAmount;
 		if (now < expirationTime) {
 			const timeLeft = (expirationTime - now) / 1000;
-			return msg.reply(`\`${command.name}\` is on cooldown for ${timeLeft.toFixed(1)} more second(s)`);
+			return msg.reply(embedify(`\`${command.name}\` is on cooldown for ${timeLeft.toFixed(1)} more second(s)`));
 		}
     }
     timestamps.set(msg.author.id, now);
@@ -90,7 +92,7 @@ client.on("message", async (msg) => {
 		command.execute(msg, args);
 	} catch (error) {
 		console.error(error);
-		msg.reply('Something broke while executing that command.');
+		msg.reply(embedify('Something broke while executing that command.'));
 	}
 })
 

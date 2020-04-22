@@ -1,5 +1,6 @@
 const db = require('../db/db')
 const conf = db.get('conf')
+const {getRoleIDFromMention} = require('../common')
 
 module.exports = {
     name: 'join-roles',
@@ -16,17 +17,11 @@ module.exports = {
             displayRoles.push(roleData[0])
             roles.push(roleData [1])
         }
-        if (roles.length == 0) return msg.channel.send("No valid roles were specified")
+        if (roles.length == 0) return msg.channel.send("> No valid roles were specified")
         var guildConf = await conf.findOne({guildID:msg.guild.id})
         guildConf.joinRoles = roles
         guildConf.save()
-        .then(()=>msg.channel.send(`Successfully set role(s) to give on joining: ${displayRoles}`))
-        .catch(err=>{console.log(err);msg.channel.send("An error prevented the roles from being added")})
+        .then(()=>msg.channel.send(`> Successfully set role(s) to give on joining: ${displayRoles}`))
+        .catch(err=>{console.log(err);msg.channel.send("> An error prevented the roles from being added")})
     },
-}
-
-const getRoleIDFromMention = function(msg, mention) {
-    const matches = mention.match(/^<@&(\d+)>$/)
-    if (!matches) return
-    return matches
 }

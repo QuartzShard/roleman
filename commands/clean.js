@@ -1,6 +1,6 @@
 const db = require('../db/db')
 const conf = db.get('conf')
-
+const {embedify,sleep}=require('../common')
 module.exports = {
     name: 'clean',
 	description: 'Remove messages to/from this bot',
@@ -24,9 +24,9 @@ module.exports = {
                 )
             }).catch(console.error)
         }
-        msg.channel.bulkDelete(toDel,true)
-        msg.channel.send("All clean!")
-        await sleep(1500)
+        await msg.channel.bulkDelete(toDel,true)
+        msg.channel.send(embedify("All clean!"))
+        await sleep(2500)
         var toDel = await msgs.fetch().then(async messages => {
             return messages.filter(m => 
                 m.author == msg.client.user || m.content.startsWith(prefix)
@@ -35,8 +35,5 @@ module.exports = {
         msg.channel.bulkDelete(toDel,true)
     }
 }
-const sleep = function (ms) {
-    return new Promise((resolve) => {
-      setTimeout(resolve, ms);
-    });
-}    
+
+  
