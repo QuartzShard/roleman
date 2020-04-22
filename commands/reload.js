@@ -4,8 +4,9 @@ module.exports = {
 	name: 'reload',
 	description: 'Reloads a command, owner only',
     forbidden:true,
+    args:true,
 	execute(msg, args) {
-        if (!(msg.author.id == '162573022727897088')) return
+        if (!(msg.author.id == '162573022727897088')) return msg.channel.send("You don't have access to this command")
         const commandName = args[0].toLowerCase();
         if (commandName == "all" || !commandName) {
             const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));

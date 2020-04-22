@@ -17,7 +17,7 @@ module.exports = {
 			data.push('Here\'s a list of all available commands:');
 			data.push(
                 commands.map(command => {
-                    if (!command.forbidden){
+                    if (!command.forbidden && command.name){
                         return  "> **" + command.name + "**"
                     }
 				}).filter(el => {return el != null;})

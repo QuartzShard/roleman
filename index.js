@@ -6,7 +6,7 @@ const conf = db.get("conf")
 const {defaultPrefix} = require("./config.json")
 const {resolveRoleFromID, embedify} = require("./common")
 
-const client = new Discord.Client();
+const client = new Discord.Client({ partials:['MESSAGE','REACTION']});
 client.commands = new Discord.Collection();
 
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
@@ -50,6 +50,8 @@ client.on("guildMemberAdd", async (member)=>{
 })
 
 client.on("message", async (msg) => {
+    try     {if (msg.partial) await msg.fetch()}
+    catch   {return}
     const doc = await conf.findOne({guildID:msg.guild.id})
     const prefix = doc.prefix
     if (!msg.content.startsWith(prefix) || msg.author.bot || msg.channel.type === "dm") {
