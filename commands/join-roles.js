@@ -10,19 +10,19 @@ module.exports = {
     cooldown: 10,
     args:true,
     async execute(msg, args){
-        const member = await resolveMemberFromID(msg.author.id, msg.guild)
+        let member = msg.member
         if(!member.hasPermission("MANAGE_ROLES")) return msg.reply(embedify("Sorry, but you don't have permission do that."))
         var roles = []
         var displayRoles = []
-        for (const arg of args) {
-            const roleData = await getRoleIDFromMention(arg)
+        for (let arg of args) {
+            let roleData = await getRoleIDFromMention(arg)
             displayRoles.push(roleData[0])
             roles.push(roleData [1])
         }
         if (roles.length == 0) return msg.channel.send("> No valid roles were specified")
 
-        const resolvedRoles = await resolveRoleFromID(roles,msg.guild)
-        for (const role of resolvedRoles) {
+        let resolvedRoles = await resolveRoleFromID(roles,msg.guild)
+        for (let role of resolvedRoles) {
             if (role.comparePositionTo(member.roles.highest) > 0) return msg.reply(embedify("Sorry, but you don't have permission do that."))
         }
         var guildConf = await conf.findOne({guildID:msg.guild.id})

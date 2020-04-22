@@ -1,36 +1,37 @@
 const fs = require('fs')
+const { embedify } = require('../common') 
 
 module.exports = {
 	name: 'reload',
 	description: 'Reloads a command, owner only',
     forbidden:true,
-    args:true,
-	execute(msg, args) {
-        if (!(msg.author.id == '162573022727897088')) return msg.channel.send("You don't have access to this command")
-        const commandName = args[0].toLowerCase();
+	async execute(msg, args) {
+        let author = msg.author
+        if (author.id != '162573022727897088') return msg.channel.send(embedify("You don't have access to this command",false,{error:true}))
+        let commandName = args[0] || null;
         if (commandName == "all" || !commandName) {
-            const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
-            for (const file of commandFiles) {
-            	const command = requireUncached(`../commands/${file}`);
+            let commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+            for (let file of commandFiles) {
+            	let command = requireUncached(`../commands/${file}`);
             	msg.client.commands.set(command.name, command);
             }
             msg.channel.send("Reloaded all commands")
         } else {
-            const command = msg.client.commands.get(commandName)
+            let command = msg.client.commands.get(commandName.toLowerCase())
                 || msg.client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
     
             if (!command) {
-                return msg.channel.send(`There is no command with name or alias \`${commandName}\`, ${msg.author}!`);
+                return msg.channel.send(embedify(`There is no command with name or alias \`${commandName}\`, ${msg.author}!`,false,{error:true}));
             }
     
             delete require.cache[require.resolve(`./${command.name}.js`)];
     
             try {
-                const newCommand = require(`./${command.name}.js`);
+                let newCommand = require(`./${command.name}.js`);
                 msg.client.commands.set(newCommand.name, newCommand);
             } catch (error) {
                 console.log(error);
-                return msg.channel.send(`There was an error while reloading a command \`${command.name}\`:\n\`${error.msg}\``);
+                return msg.channel.send(embedify(`There was an error while reloading a command \`${command.name}\`:\n\`${error.msg}\``,false,{error:true}));
             }
             msg.channel.send(`Command \`${command.name}\` was reloaded!`);
         }

@@ -8,10 +8,10 @@ module.exports = {
 	usage: '[command name]',
 	cooldown: 5,
 	async execute(msg, args) {
-		const data = [];
-		const { commands } = msg.client;
-        const doc = await conf.findOne({guildID:msg.guild.id})
-        const prefix = doc.prefix
+		let data = [];
+		let { commands } = msg.client;
+        let doc = await conf.findOne({guildID:msg.guild.id})
+        let prefix = doc.prefix
 
 		if (!args.length) {
 			data.push('Here\'s a list of all available commands:');
@@ -25,14 +25,14 @@ module.exports = {
             );
 			data.push(`\nUse \`${prefix}help [command name]\` to get info on a specific command.`);
 
-			return msg.channel.send(embedify(data.shift(),data,true))
+			return msg.channel.send(embedify(data.shift(),data,{thumbnail:true}))
 		}
 
-		const name = args[0].toLowerCase();
-		const command = commands.get(name) || commands.find(c => c.aliases && c.aliases.includes(name));
+		let name = args[0].toLowerCase();
+		let command = commands.get(name) || commands.find(c => c.aliases && c.aliases.includes(name));
 
 		if (!command) {
-			return msg.channel.send(embedify(`Command not recognised, try \`${prefix}help\`.`));
+			return msg.channel.send(embedify(`Command not recognised, try \`${prefix}help\`.`,false,{error:true}));
 		}
 
 		data.push(`**${command.name}:**`);
@@ -42,7 +42,7 @@ module.exports = {
 		if (command.usage) data.push(`**Usage:** ${prefix}${command.name} ${command.usage}`);
 
 		data.push(`**Cooldown:** ${command.cooldown || 3} second(s)`);
-		const helpEmbed = embedify(data.shift(),[data],true)
+		let helpEmbed = embedify(data.shift(),[data],{thumbnail:true})
 		return msg.channel.send(helpEmbed)
 		//return msg.channel.send(data, { split: true });
 	},

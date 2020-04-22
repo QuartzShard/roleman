@@ -87,25 +87,29 @@ module.exports = {
      * 
      * @param {String} title The title of the embed card
      * @param {Array} body The body content of the embed card
-     * @param {Boolean} thumbnail Display the thumbnail (default false)
-     * @param {String} url Url to link to
+     * @param {Object} options A set of boolean options
      * Format a message into an embed.
+     * Valid options include url, thumbnail, error
      */
-    embedify(title,body,thumbnail,url){
+    embedify(title,body,options){
         var embed = new Discord.MessageEmbed()
-        .setColor('#b4ebeb')
         .setTimestamp(Date.now())
+
+        if (!options) options = {}
         
         if (title) embed.setTitle(title)
-        if (url) embed.setURL(url)
         if (body){
             for (const elem of body){
                 embed.addField(hr,elem)
             }
-            
         }
-        if (thumbnail) embed.setThumbnail('https://quartzshard.com/images/RoleMan.jpg')
-
+        if (options.url) embed.setURL(url)
+        if (options.thumbnail) embed.setThumbnail('https://quartzshard.com/images/RoleMan.jpg')
+        if (options.error) {
+            embed.setColor('#FF0000')
+        } else {
+            embed.setColor('#b4ebeb')
+        }
         return embed
     },
     /**

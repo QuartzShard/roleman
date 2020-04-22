@@ -4,15 +4,17 @@ const Discord = require('discord.js');
 const db = require('./db/db')
 const conf = db.get("conf")
 const {defaultPrefix} = require("./config.json")
-const {resolveRoleFromID, embedify} = require("./common")
+const {resolveRoleFromID, resolveMemberFromID, embedify} = require("./common")
 
+//const client = new Discord.Client();
 const client = new Discord.Client({ partials:['MESSAGE','REACTION']});
+
 client.commands = new Discord.Collection();
 
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
-for (const file of commandFiles) {
-	const command = require(`./commands/${file}`);
+for (let file of commandFiles) {
+	let command = require(`./commands/${file}`);
 	client.commands.set(command.name, command);
 }
 
@@ -24,14 +26,14 @@ client.once('ready', () => {
 
 client.on('guildCreate', async (guild) => {
     if (! await db.get('conf').findOne({guildID:guild.id})) {
-        const doc = new conf({guildID:guild.id,prefix:defaultPrefix})
+        let doc = new conf({guildID:guild.id,prefix:defaultPrefix})
         doc.save().then(()=>console.log("New server registered! " + guild.name)).catch(err=>console.log(err))
     }
     if (guild.systemChannel){
-        guild.systemChannel.send(embedify("Thanks for adding this bot! The default prefix is `rm!`, try `rm!help` to get started."))
+        guild.systemChannel.channel.send(embedify("Thanks for adding this bot! The default prefix is `rm!`, try `rm!help` to get started."))
     } else {
         guild.channels.cache.filter(c=>c.type=="text").array()[0]
-        .send(embedify("Thanks for adding this bot! The default prefix is `rm!`, try `rm!help` to get started."))
+        .channel.send(embedify("Thanks for adding this bot! The default prefix is `rm!`, try `rm!help` to get started."))
     }
 })
 client.on("guildDelete", async (guild)=>{
@@ -39,11 +41,11 @@ client.on("guildDelete", async (guild)=>{
 })
 
 client.on("guildMemberAdd", async (member)=>{
-    const guild = member.guild
-    const guildConf = await conf.findOne({guildID:guild.id})
+    let guild = member.guild
+    let guildConf = await conf.findOne({guildID:guild.id})
     if (guildConf.joinRoles) {
-        const roles = await resolveRoleFromID(guildConf.joinRoles,guild) 
-        for (const role of roles) {
+        let roles = await resolveRoleFromID(guildConf.joinRoles,guild) 
+        for (let role of roles) {
             member.roles.add(role)
         }
     }
@@ -52,18 +54,22 @@ client.on("guildMemberAdd", async (member)=>{
 client.on("message", async (msg) => {
     try     {if (msg.partial) await msg.fetch()}
     catch   {return}
-    const doc = await conf.findOne({guildID:msg.guild.id})
-    const prefix = doc.prefix
+    let doc = await conf.findOne({guildID:msg.guild.id})
+    let prefix = doc.prefix
+
     if (!msg.content.startsWith(prefix) || msg.author.bot || msg.channel.type === "dm") {
         return 
     };
+
+    console.log(msg.author, msg.member)
+
     var args = msg.content.slice(prefix.length).split(/ +/)
     var commandName = args.shift().toLowerCase()
     
     var command = client.commands.get(commandName) || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
     
     if(!command) {
-        return msg.reply(embedify(`Command not recognised, try \`${prefix}help\`.`))
+        return msg.channel.send(embedify(`Command not recognised, try \`${prefix}help\`.`,false,{error:true}))
     }
 
     if (command.args && !args.length) {
@@ -71,20 +77,20 @@ client.on("message", async (msg) => {
 		if (command.usage) {
 			reply.push(`The proper usage would be: \`${prefix}${command.name} ${command.usage}\``);
 		}
-		return msg.reply(embedify(reply.shift(),reply));
+		return msg.channel.send(embedify(reply.shift(),reply,{error:true}));
     }
     
     if (!cooldowns.has(command.name)) {
 		cooldowns.set(command.name, new Discord.Collection());
     }
-    const now = Date.now();
-	const timestamps = cooldowns.get(command.name);
-    const cooldownAmount = (command.cooldown || 3) * 1000;
+    let now = Date.now();
+	let timestamps = cooldowns.get(command.name);
+    let cooldownAmount = (command.cooldown || 3) * 1000;
     if (timestamps.has(msg.author.id)) {
-		const expirationTime = timestamps.get(msg.author.id) + cooldownAmount;
+		let expirationTime = timestamps.get(msg.author.id) + cooldownAmount;
 		if (now < expirationTime) {
-			const timeLeft = (expirationTime - now) / 1000;
-			return msg.reply(embedify(`\`${command.name}\` is on cooldown for ${timeLeft.toFixed(1)} more second(s)`));
+			let timeLeft = (expirationTime - now) / 1000;
+			return msg.channel.send(embedify(`\`${command.name}\` is on cooldown for ${timeLeft.toFixed(1)} more second(s)`,false,{error:true}));
 		}
     }
     timestamps.set(msg.author.id, now);
@@ -94,7 +100,7 @@ client.on("message", async (msg) => {
 		command.execute(msg, args);
 	} catch (error) {
 		console.error(error);
-		msg.reply(embedify('Something broke while executing that command.'));
+		msg.channel.send(embedify('Something broke while executing that command.',false,{error:true}));
 	}
 })
 

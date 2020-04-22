@@ -7,10 +7,10 @@ module.exports= {
     args:true,
     usage:"<@role>",
     async execute(msg, args) {
-        const member = await resolveMemberFromID(msg.author.id,msg.guild)
-        if(!member.hasPermission("MANAGE_ROLES")) return msg.reply(embedify("Sorry, but you don't have permission do that."))
-        const roleID= await getRoleIDFromMention(args[0])[1]
-        const holders = await getUsersFromRole(roleID,msg.guild)
+        let member = msg.member
+        if(!member.hasPermission("MANAGE_ROLES")) return msg.reply(embedify("Sorry, but you don't have permission do that.",false,{error:true}))
+        let roleID= await getRoleIDFromMention(args[0])[1]
+        let holders = await getUsersFromRole(roleID,msg.guild)
         msg.channel.send(args[0])
         try {
             msg.channel.send(embedify('Users with these roles: ', [holders.map(h => [h.user.tag,':',"\"" + (h.nickname || h.user.username) + "\""].join(" "))]))

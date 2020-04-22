@@ -7,24 +7,24 @@ module.exports = {
     usage:"<@role to assign> <@target> [<@target,...]",
     args:true,
     async execute(msg, args){
-        const member = await resolveMemberFromID(msg.author.id,msg.guild)
-        if(!member.hasPermission("MANAGE_ROLES")) return msg.reply(embedify("Sorry, but you don't have permission do that."))
-        const addRole = args.shift()
-        if (args == []) return msg.channel.send(embedify("No target users specified"))
-        const addRoleID = await getRoleIDFromMention(addRole)[1]
-        const addRoleRes = await resolveRoleFromID(addRoleID,msg.guild)
-        if (addRoleRes.comparePositionTo(member.roles.highest) > 0) return msg.reply(embedify("Sorry, but you don't have permission do that."))
-        for (const arg of args) {
-            const typedArg = await determineMentionType(arg)
+        let member = msg.member
+        if(!member.hasPermission("MANAGE_ROLES")) return msg.channel.send(embedify("Sorry, but you don't have permission do that.",false,{error:true}))
+        let addRole = args.shift()
+        if (args == []) return msg.channel.send(embedify("No target users specified",false,{error:true}))
+        let addRoleID = await getRoleIDFromMention(addRole)[1]
+        let addRoleRes = await resolveRoleFromID(addRoleID,msg.guild)
+        if (addRoleRes.comparePositionTo(member.roles.highest) > 0) return msg.channel.send(embedify("Sorry, but you don't have permission do that.",false,{error:true}))
+        for (let arg of args) {
+            let typedArg = await determineMentionType(arg)
             switch (typedArg.type) {
                 case "role":
-                    const targetRoleID = await getRoleIDFromMention(typedArg.mention)[1]
-                    const users = await getUsersFromRole(targetRoleID,msg.guild)
+                    let targetRoleID = await getRoleIDFromMention(typedArg.mention)[1]
+                    let users = await getUsersFromRole(targetRoleID,msg.guild)
                     await users.each(u => u.roles.add(addRoleRes))
                     break;
                 case "user":
-                    const userID = await getUserIDFromMention(typedArg.mention)[1]
-                    const addMember = await resolveMemberFromID(userID,msg.guild)
+                    let userID = await getUserIDFromMention(typedArg.mention)[1]
+                    let addMember = await resolveMemberFromID(userID,msg.guild)
                     await addMember.roles.add(addRoleRes)
                     break;
                 case null:

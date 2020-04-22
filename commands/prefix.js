@@ -6,14 +6,16 @@ module.exports = {
     name: 'prefix',
 	description: 'Change the command prefix',
 	usage: '<new prefix>',
-    cooldown: 36000,
+    cooldown: 600,
     args:true,
     async execute(msg, args){
-        const member = await resolveMemberFromID(msg.author.id, msg.guild)
-        if(!member.hasPermission("MANAGE_SERVER")) return msg.reply(embedify("Sorry, but you don't have permission do that."))
-        const doc = await conf.findOne({guildID:msg.guild.id})
-        const newPrefix = args[0]
+        let member = msg.member
+        if(!member.hasPermission("MANAGE_GUILD")) return msg.channel.send(embedify("Sorry, but you don't have permission do that.",false,{error:true}))
+        let doc = await conf.findOne({guildID:msg.guild.id})
+        let newPrefix = args[0]
         doc.prefix = newPrefix
-        doc.save().then(()=>msg.channel.send(`Prefix updated to ${newPrefix}`)).catch(err=>{console.log(err), msg.channel.send("Error updating prefix")})
+        doc.save()
+            .then(()=>msg.channel.send(embedify(`Prefix updated to ${newPrefix}`)))
+            .catch(err=>{console.log(err), msg.channel.send(embedify("Error updating prefix",false,{error:true}))})
     }
 }

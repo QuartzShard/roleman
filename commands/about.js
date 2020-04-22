@@ -6,6 +6,6 @@ module.exports = {
     aliases:["github","source","dev","development","contribute"],
     cooldown:10,
     execute(msg){
-        msg.channel.send(embedify("[RoleMan on GitHub]",false,false,"https://github.com/QuartzShard/roleman"))
+        msg.channel.send(embedify("[RoleMan on GitHub]",false,{url:"https://github.com/QuartzShard/roleman"}))
     }
 }
