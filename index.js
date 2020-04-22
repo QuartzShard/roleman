@@ -2,6 +2,7 @@ require('dotenv').config()
 const fs = require('fs');
 const Discord = require('discord.js');
 const db = require('./db/db')
+const conf = db.get("conf")
 const {defaultPrefix} = require("./config.json")
 
 const client = new Discord.Client();
@@ -21,19 +22,32 @@ client.once('ready', () => {
 });
 
 client.on('guildCreate', async (guild) => {
-    const conf = db.get("conf")
     if (! await db.get('conf').findOne({guildID:guild.id})) {
         const doc = new conf({guildID:guild.id,prefix:defaultPrefix})
         doc.save().then(()=>console.log("New server registered! " + guild.name)).catch(err=>console.log(err))
     }
+    if (guild.systemChannel){
+        guild.systemChannel.send("Thanks for adding this bot! The default prefix is `rm!`, try `rm!help` to get started.")
+    } else {
+        guild.channels.cache.filter(c=>c.type=="text").array()[0].send("Thanks for adding this bot! The default prefix is `rm!`, try `rm!help` to get started.")
+    }
 })
 client.on("guildDelete", async (guild)=>{
-    const conf = db.get("conf")
     conf.remove({guildID:guild.id}).then(()=>console.log("Bot removed from " + guild.name)).catch(err=>console.log(err))
 })
 
+client.on("guildMemberAdd", async (member)=>{
+    const guild = member.guild
+    const guildConf = await conf.findOne({guildID:guild.id})
+    if (guildConf.joinRoles) {
+        for (const role of guildConf.joinRoles) {
+            const resolvedRole = await guild.roles.fetch(role)
+            member.roles.add(resolvedRole)
+        }
+    }
+})
+
 client.on("message", async (msg) => {
-    const conf = db.get("conf")
     const doc = await conf.findOne({guildID:msg.guild.id})
     const prefix = doc.prefix
     if (!msg.content.startsWith(prefix) || msg.author.bot || msg.channel.type === "dm") {

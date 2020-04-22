@@ -13,6 +13,10 @@ module.exports = {
             prefix: {
                 type:String,
                 required:true,
+            },
+            joinRoles:{
+                type:Array,
+                required:false,
             }
         }),
 }
