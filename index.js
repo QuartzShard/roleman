@@ -1,50 +1,68 @@
 require('dotenv').config()
+const fs = require('fs');
 const Discord = require('discord.js');
-const client = new Discord.Client();
 const {prefix} = require("./config.json")
+
+const client = new Discord.Client();
+client.commands = new Discord.Collection();
+
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+
+for (const file of commandFiles) {
+	const command = require(`./commands/${file}`);
+	client.commands.set(command.name, command);
+}
+
+const cooldowns = new Discord.Collection();
 
 client.once('ready', () => {
 	console.log('Ready!');
 });
 
 client.on("message", (msg) => {
-    if (!msg.content.startsWith(prefix) || msg.author.bot || msg.channel.type === "dm") return;
+    if (!msg.content.startsWith(prefix) || msg.author.bot || msg.channel.type === "dm") {
+        return 
+    };
     var args = msg.content.slice(prefix.length).split(/ +/)
-    var command = args.shift().toLowerCase()
-    switch(command) {
-        case "robotnik":
-            if(msg.mentions.users.first() == client.user) {
-                target = msg.author
-            } else {
-                target = msg.mentions.users.first()
-            }
-            robotnik(target, msg.channel)
-            break;
-        case "help":
-            helpMenu(msg.channel)
-          break;
-        default:
-            msg.reply(`I don't recognize that command, try ${prefix}help`)
-      }
+    var commandName = args.shift().toLowerCase()
+    
+    var command = client.commands.get(commandName) || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
+    
+    if(!command) {
+        return msg.reply(`Command not recognised, try \`${prefix}help\`.`)
+    }
+
+    if (command.args && !args.length) {
+		let reply = `You didn't provide any arguments, ${msg.author}!`;
+		if (command.usage) {
+			reply += `\nThe proper usage would be: \`${prefix}${command.name} ${command.usage}\``;
+		}
+		return msg.reply(reply);
+    }
+    
+    if (!cooldowns.has(command.name)) {
+		cooldowns.set(command.name, new Discord.Collection());
+    }
+    const now = Date.now();
+	const timestamps = cooldowns.get(command.name);
+    const cooldownAmount = (command.cooldown || 3) * 1000;
+    if (timestamps.has(msg.author.id)) {
+		const expirationTime = timestamps.get(msg.author.id) + cooldownAmount;
+		if (now < expirationTime) {
+			const timeLeft = (expirationTime - now) / 1000;
+			return msg.reply(`\`${command.name}\` is on cooldown for ${timeLeft.toFixed(1)} more second(s)`);
+		}
+    }
+    timestamps.set(msg.author.id, now);
+    setTimeout(() => timestamps.delete(msg.author.id), cooldownAmount);
+    
+    try {
+		command.execute(msg, args);
+	} catch (error) {
+		console.error(error);
+		msg.reply('Something broke while executing that command.');
+	}
 })
 
-/**
- * 
- * @param {String} target Target of the callout post
- * Make a callout post on twitter dot com
- */
-var robotnik = function(target, channel) {
-    if (!target){
-        target = "Shadow the Hedgehog"
-    }
-    channel.send(`***I've come to make an announcement: ${target}'s a bitch-ass motherfucker. He pissed on my fucking wife. That's right, he took his hedgehog fuckin' quilly dick out and he pissed on my fucking wife, and he said his dick was \"THIS BIG\", and I said \"That's disgusting!\" So I'm making a callout post on my Twitter dot com. ${target}, you got a small dick! It's the size of this walnut except WAY smaller! And guess what? Here's what my dong looks like!That's right, baby! All points, no quills, no pillows, look at that, it looks like two balls and a bong! He fucked my wife, so guess what, I'm gonna fuck the Earth! That's right, this is what you get, my SUPER LASER PISS! Except I'm not gonna piss on the Earth, I'm gonna go higher. I'm pissing on the MOON! HOW DO YOU LIKE THAT, OBAMA? I PISSED ON THE MOON, YOU IDIOT!  You have 23 hours before the piss DRRRROPLLLETS hit the fucking Earth! Now get out of my fucking sight, before I piss on you too!***`)
-}
-/**
- * 
- * @param {*} channel Channel to reply to
- */
-var helpMenu = function(channel){
-    channel.send("Here's a list of all my commands: \nWIP")
-    return
-}
 client.login(process.env.API_TOKEN);
+
