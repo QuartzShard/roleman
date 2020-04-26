@@ -20,7 +20,7 @@ for (let file of commandFiles) {
 
 const cooldowns = new Discord.Collection();
 
-client.once('ready', () => {
+client.once('ready', async () => {
 	console.log('Ready!');
 });
 
@@ -51,6 +51,24 @@ client.on("guildMemberAdd", async (member)=>{
     }
 })
 
+//client.on("messageReactionAdd", async (reaction,user) => {
+//    if (user.bot) return
+//    let guildConf = await conf.findOne({guildID:reaction.message.guild.id})
+//    if (!guildConf.selfRoles.some(m => m.id == reaction.message.id)) return
+//    let member = await resolveMemberFromID(user.id,reaction.message.guild)
+//    let roleSet = guildConf.selfRoles.map(e => e.message.id == reaction.message.id)[0].roleSet
+//    let emojis = []
+//    let roles = []
+//    for (let i of roleSet){
+//        emojis.push(i[0])
+//        roles.push(i[1])
+//    }
+//    if (emojis.includes(reaction.emoji.name)) {
+//        let index = emojis.indexOf(reaction.emoji.name)
+//        return member.roles.add(roles[index])
+//    } 
+//})
+
 client.on("message", async (msg) => {
     try     {if (msg.partial) await msg.fetch()}
     catch   {return}
@@ -71,7 +89,7 @@ client.on("message", async (msg) => {
     if(!command) {
         return msg.channel.send(embedify(`Command not recognised, try \`${prefix}help\`.`,false,{error:true}))
     }
-
+    
     if (command.args && !args.length) {
 		let reply = [`You didn't provide any arguments, and this command expects some`];
 		if (command.usage) {

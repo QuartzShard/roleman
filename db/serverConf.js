@@ -17,7 +17,12 @@ module.exports = {
             joinRoles:{
                 type:Array,
                 required:false,
+            },
+            selfRoles:{
+                emojis:Array,
+                roles:Array
             }
+            
         }),
 }
 
