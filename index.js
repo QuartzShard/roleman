@@ -61,7 +61,7 @@ client.on("message", async (msg) => {
         return 
     };
 
-    console.log(msg.author, msg.member)
+    if (process.env.DEBUG) console.log(msg.author, msg.member)
 
     var args = msg.content.slice(prefix.length).split(/ +/)
     var commandName = args.shift().toLowerCase()
