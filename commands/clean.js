@@ -16,7 +16,7 @@ module.exports = {
                 return messages.filter(m => 
                     m.author == msg.client.user || m.content.startsWith(prefix)
                 )
-            }).catch(msg.channel.send(embedify("There was a error while cleaning up.",false,{error:true})))
+            })
         } else {
             var toDel = await msgs.fetch().then(async messages => {
                 return messages.filter(m => 
@@ -31,7 +31,7 @@ module.exports = {
             return messages.filter(m => 
                 m.author == msg.client.user || m.content.startsWith(prefix)
             )
-        }).catch(msg.channel.send(embedify("There was a error while cleaning up.",false,{error:true})))
+        })
         msg.channel.bulkDelete(toDel,true)
     }
 }
