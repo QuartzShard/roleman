@@ -27,7 +27,7 @@ module.exports = {
 
         let guildConf = await conf.findOne({guildID:msg.guild.id})
         let prefix = guildConf.prefix
-        guildConf.selfRoles = {emojis:emojis,roles:roles.forEach(e => e.id)}
+        guildConf.selfRoles = {emojis:emojis,roles:roles}
         await guildConf.save()
 
 

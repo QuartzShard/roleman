@@ -12,17 +12,19 @@ module.exports = {
 
         let guildConf = await conf.findOne({guildID:msg.guild.id})
         let prefix = guildConf.prefix
-        let { emojis, roles } = guildConf.selfRoles
+        let emojis= guildConf.selfRoles.emojis
+        let roles = guildConf.selfRoles.roles
         let emojiFilter = (reaction,user) => {
             return emojis.includes(reaction.emoji.name) && !user.bot
         } 
         let resolvedRoles = []
-        await roles.forEach(async e => resolvedRoles.push(await resolveRoleFromID(e,msg.guild)))
+        for (let i of roles) {
+            resolvedRoles.push(await resolveRoleFromID(i,msg.guild))
+        }
         let content = []
         for (let i in resolvedRoles) {
             content.push(`${emojis[i]}: ${resolvedRoles[i]}`)
         }
-
         msg.channel.send(embedify("The following roles are available:",[content,`React to this message to be given the corresponding role.\nThis message will be valid for 10 minutes, do \`${prefix}self-roles\`to refresh it afterwards`]))
         .then(async (reply) => {
             await emojis.forEach(async e => await reply.react(e) )
