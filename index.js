@@ -73,7 +73,11 @@ client.on("message", async (msg) => {
     try     {if (msg.partial) await msg.fetch()}
     catch   {return}
     let doc = await conf.findOne({guildID:msg.guild.id})
-    let prefix = doc.prefix
+    if (!doc) {
+        doc = new conf({guildID:guild.id,prefix:defaultPrefix})
+        doc.save().then(()=>console.log("New server registered! " + guild.name)).catch(err=>console.log(err))
+    }
+    let prefix = doc.prefix 
 
     if (!msg.content.startsWith(prefix) || msg.author.bot || msg.channel.type === "dm") {
         return 
