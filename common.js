@@ -103,7 +103,7 @@ module.exports = {
                 embed.addField(hr,elem)
             }
         }
-        if (options.url) embed.setURL(url)
+        if (options.url) embed.setURL(options.url)
         if (options.thumbnail) embed.setThumbnail('https://quartzshard.com/images/RoleMan.jpg')
         if (options.error) {
             embed.setColor('#FF0000')
