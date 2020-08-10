@@ -18,10 +18,10 @@ module.exports = {
                 type:Array,
                 required:false,
             },
-            selfRoles:{
-                emojis:Array,
-                roles:Array
-            }
+            selfRoles:[{
+                emoji: Object,
+                role: Object
+            }]
             
         }),
 }

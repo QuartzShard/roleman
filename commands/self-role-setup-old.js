@@ -4,7 +4,7 @@ const conf = db.get('conf')
 
 module.exports = {
     name:"self-role-setup",
-    aliases:["selfrolesetup","rolesetup"],
+    forbidden:true,
     description:"Create a set of roles users can assign to themselves by reacting to the message",
     usage:"<emoji> <role> [<emoji> <role>,...]",
     args:true,

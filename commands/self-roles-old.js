@@ -3,8 +3,8 @@ const db = require('../db/db')
 const conf = db.get('conf')
 
 module.exports = {
-    name:"self-roles",
-    aliases:["selfroles"],
+    name:"self-roles-old",
+    forbidden:true,
     description:"See roles you can assign to yourself",
     async execute(msg, args) {
         let author = msg.author
