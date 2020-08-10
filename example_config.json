@@ -1,0 +1,5 @@
+{
+    "defaultPrefix":"rm!",
+    "dbUrl":"mongodb://<database_url>/RoleMan",
+    "API_TOKEN":"<token goes here>"
+}
