@@ -5,7 +5,6 @@ const {getEmojiIdFromString} = require('../common')
 
 module.exports = {
     name:"self-role-setup",
-    forbidden:true,
     description:"Create a set of roles users can assign to themselves by reacting to the message",
     usage:"<emoji> <role> [<emoji> <role>,...]",
     args:true,
@@ -38,7 +37,7 @@ module.exports = {
             if (/^[0-9]+$/.test(emojis[i])) emojis[i] = await guild.emojis.resolve(emojis[i])
             content.push(`${emojis[i]}: ${roles[i]}`)
         }
-        msg.channel.send(embedify("The following roles have been assigned:",[content]))
+        msg.channel.send(embedify("The following roles are available:",[content]))
         .then(async (reply) => {
             await emojis.forEach(async e => {
                 if(e.guild) {
@@ -49,7 +48,7 @@ module.exports = {
                 await reply.react(r)
             } )
         }) 
-        
+        msg.delete()
 
         
     }
