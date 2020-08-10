@@ -20,7 +20,7 @@ for (let file of commandFiles) {
 const cooldowns = new Discord.Collection();
 
 client.once('ready', async () => {
-	console.log('Ready! ', client.user);
+	console.log('Ready!');
 });
 
 client.on('guildCreate', async (guild) => {
