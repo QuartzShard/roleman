@@ -1,6 +1,6 @@
 const db = require('../db/db')
 const conf = db.get('conf')
-const {resolveMemberFromID} = require('../common')
+const { embedify } = require('../common')
 
 module.exports = {
     name: 'prefix',
