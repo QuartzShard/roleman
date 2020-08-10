@@ -1,9 +1,8 @@
-require('dotenv').config()
 const fs = require('fs');
 const Discord = require('discord.js');
-const db = require('./db/db')
+const db = require(`${__dirname}/db/db`)
 const conf = db.get("conf")
-const {defaultPrefix} = require("./config.json")
+const {defaultPrefix, API_TOKEN} = require("./config.json")
 const {resolveRoleFromID, resolveMemberFromID, embedify} = require("./common")
 
 //const client = new Discord.Client();
@@ -11,17 +10,17 @@ const client = new Discord.Client({ partials:['MESSAGE','REACTION']});
 
 client.commands = new Discord.Collection();
 
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+const commandFiles = fs.readdirSync(`${__dirname}/commands`).filter(file => file.endsWith('.js'));
 
 for (let file of commandFiles) {
-	let command = require(`./commands/${file}`);
+	let command = require(`${__dirname}/commands/${file}`);
 	client.commands.set(command.name, command);
 }
 
 const cooldowns = new Discord.Collection();
 
 client.once('ready', async () => {
-	console.log('Ready!');
+	console.log('Ready! ', client.user);
 });
 
 client.on('guildCreate', async (guild) => {
@@ -51,31 +50,27 @@ client.on("guildMemberAdd", async (member)=>{
     }
 })
 
-//client.on("messageReactionAdd", async (reaction,user) => {
-//    if (user.bot) return
-//    let guildConf = await conf.findOne({guildID:reaction.message.guild.id})
-//    if (!guildConf.selfRoles.some(m => m.id == reaction.message.id)) return
-//    let member = await resolveMemberFromID(user.id,reaction.message.guild)
-//    let roleSet = guildConf.selfRoles.map(e => e.message.id == reaction.message.id)[0].roleSet
-//    let emojis = []
-//    let roles = []
-//    for (let i of roleSet){
-//        emojis.push(i[0])
-//        roles.push(i[1])
-//    }
-//    if (emojis.includes(reaction.emoji.name)) {
-//        let index = emojis.indexOf(reaction.emoji.name)
-//        return member.roles.add(roles[index])
-//    } 
-//})
+client.on("messageReactionAdd", async (reaction,user) => {
+    if (user.bot) return
+    if (reaction.message.partial) reaction.message = await reaction.message.fetch()
+    if (reaction.message.author.id != client.user.id) return
+    let guildConf = await conf.findOne({guildID:reaction.message.guild.id})
+    if (!guildConf.selfRoles) return
+    let member = await resolveMemberFromID(user.id,reaction.message.guild)
+    guildConf.selfRoles.map(m => {
+        if(m.emoji == reaction.emoji.id || m.emoji == reaction.emoji.name) {
+            member.roles.add(m.role)
+        }
+    } )
+})
 
 client.on("message", async (msg) => {
     try     {if (msg.partial) await msg.fetch()}
     catch   {return}
     let doc = await conf.findOne({guildID:msg.guild.id})
     if (!doc) {
-        doc = new conf({guildID:guild.id,prefix:defaultPrefix})
-        doc.save().then(()=>console.log("New server registered! " + guild.name)).catch(err=>console.log(err))
+        doc = new conf({guildID:msg.guild.id,prefix:defaultPrefix})
+        doc.save().then(()=>console.log("New server registered! " + msg.guild.name)).catch(err=>console.log(err))
     }
     let prefix = doc.prefix 
 
@@ -125,6 +120,5 @@ client.on("message", async (msg) => {
 		msg.channel.send(embedify('Something broke while executing that command.',false,{error:true}));
 	}
 })
-
-client.login(process.env.API_TOKEN);
+client.login(API_TOKEN);
 
