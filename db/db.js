@@ -1,9 +1,9 @@
 const fs = require('fs')
 const mongoose = require('mongoose')
 mongoose.Promise = require('promise')
-const { dbUrl } = require("../config.json")
+const { dbUrl, DB_USER, DB_PASSWORD } = require("../config.json")
 
-const mongoCon = mongoose.createConnection(dbUrl, {useNewUrlParser:true})
+const mongoCon = mongoose.createConnection(`${DB_USER}:${DB_PASSWORD}@${dbUrl}`, {useNewUrlParser:true})
 mongoCon.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db = new Map()
 
