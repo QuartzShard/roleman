@@ -64,6 +64,20 @@ client.on("messageReactionAdd", async (reaction,user) => {
     } )
 })
 
+client.on("messageReactionRemove", async (reaction,user) => {
+    if (user.bot) return
+    if (reaction.message.partial) reaction.message = await reaction.message.fetch()
+    if (reaction.message.author.id != client.user.id) return
+    let guildConf = await conf.findOne({guildID:reaction.message.guild.id})
+    if (!guildConf.selfRoles) return
+    let member = await resolveMemberFromID(user.id,reaction.message.guild)
+    guildConf.selfRoles.map(m => {
+        if(m.emoji == reaction.emoji.id || m.emoji == reaction.emoji.name) {
+            member.roles.remove(m.role)
+        }
+    } )
+})
+
 client.on("message", async (msg) => {
     try     {if (msg.partial) await msg.fetch()}
     catch   {return}
