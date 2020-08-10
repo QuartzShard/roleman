@@ -85,6 +85,15 @@ module.exports = {
     },
     /**
      * 
+     * @param {String} emojiString 
+     * Gets the numeric id from a string
+     */
+    async getEmojiIdFromString(emojiString){
+        if (/^<:.+:[0-9]+>$/.test(emojiString)) return emojiString.match(/^<:.+:([0-9]+)>$/)[1]
+        return null
+    },
+    /**
+     * 
      * @param {String} title The title of the embed card
      * @param {Array} body The body content of the embed card
      * @param {Object} options A set of boolean options
