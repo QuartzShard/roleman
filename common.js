@@ -10,7 +10,7 @@ module.exports = {
      * @param {*} mention The mentioned role from args list
      * Returns an array of [mention, roleID]
      */
-    getRoleIDFromMention(mention) {
+    async getRoleIDFromMention(mention) {
         const matches = mention.match(/^<@&(\d+)>$/)
         if (!matches && mention == "@everyone"){
             return ["@everyone","@everyone"]
@@ -24,8 +24,8 @@ module.exports = {
      * @param {*} mention The mentioned user from args list
      * Returns an array of [mention,userID]
      */
-    getUserIDFromMention(mention) {
-        const matches = mention.match(/^<@!?(\d+)>$/)
+    async getUserIDFromMention(mention) {
+        let matches = mention.match(/^<@!?(\d+)>$/)
         if (!matches) return
         return matches
     },
@@ -75,12 +75,29 @@ module.exports = {
     },
     /**
      * 
+     * @param {String} inp 
+     * Takes something which might be a role, and tries to resolve it to a discord.js Role
+     */
+    async smartRoleResolver(inp, guild) {
+        if (/^<@&\d+>$/.test(inp)) {
+            let roleId = inp.match(/^<@&(\d+)>$/)[1]
+            let role = await guild.roles.cache.find(r => r.id == roleId)
+            return role
+        }
+        if (/^\d+$/.test(inp)) {
+            let role = await guild.roles.cache.find(r => r.id == inp)
+            return role
+        }
+        return guild.roles.cache.find(r => r.name == inp)
+    },
+    /**
+     * 
      * @param {*} id User's ID
      * @param {*} guild Guid to resolve in
      * Gets a member given a User and a guild
      */
     async resolveMemberFromID(id,guild) {
-        const member = await guild.members.cache.find(m => m.user.id = id)
+        const member = await guild.members.cache.find(m => m.user.id == id)
         return member
     },
     /**

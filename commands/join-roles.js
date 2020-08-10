@@ -1,6 +1,6 @@
 const db = require('../db/db')
 const conf = db.get('conf')
-const {getRoleIDFromMention, resolveRoleFromID,resolveMemberFromID, embedify} = require('../common')
+const {getRoleIDFromMention, resolveRoleFromID, embedify} = require('../common')
 
 module.exports = {
     name: 'join-roles',

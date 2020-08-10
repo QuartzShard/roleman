@@ -1,4 +1,4 @@
-const {getRoleIDFromMention,getUsersFromRole,resolveMemberFromID,embedify} = require('../common')
+const {getRoleIDFromMention,getUsersFromRole,embedify} = require('../common')
 
 module.exports= {
     name:"list-role-holders",
