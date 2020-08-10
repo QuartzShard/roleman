@@ -10,6 +10,7 @@ module.exports = {
                 type:String,
                 required:true,
             },
+            guildName: String,
             prefix: {
                 type:String,
                 required:true,

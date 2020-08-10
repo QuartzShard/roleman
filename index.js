@@ -25,7 +25,7 @@ client.once('ready', async () => {
 
 client.on('guildCreate', async (guild) => {
     if (! await db.get('conf').findOne({guildID:guild.id})) {
-        let doc = new conf({guildID:guild.id,prefix:defaultPrefix})
+        let doc = new conf({guildID:guild.id,guildName:guild.name,prefix:defaultPrefix})
         doc.save().then(()=>console.log("New server registered! " + guild.name)).catch(err=>console.log(err))
     }
     if (guild.systemChannel){
@@ -83,7 +83,7 @@ client.on("message", async (msg) => {
     catch   {return}
     let doc = await conf.findOne({guildID:msg.guild.id})
     if (!doc) {
-        doc = new conf({guildID:msg.guild.id,prefix:defaultPrefix})
+        doc = new conf({guildID:msg.guild.id,guildName:msg.guild.name,prefix:defaultPrefix})
         doc.save().then(()=>console.log("New server registered! " + msg.guild.name)).catch(err=>console.log(err))
     }
     let prefix = doc.prefix 
