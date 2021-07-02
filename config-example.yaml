@@ -1,0 +1,17 @@
+# Discord API settings
+discord:
+  token: "TOKEN"                        # Provide your token here
+  intents:        
+    members: True                       # Don't touch this unless you know what you're doing
+
+# Bot settings        
+options: 
+  prefix: "!" #Bot Command Prefix
+  logging:                              
+    # WARNING! if you diable all logging and something breaks, fixing it will be very difficult. 
+    # Recommend you leave console logging enabled as a minimum
+    logToConsole: True                  # Enable logging to console
+    logToFile: False                    # Enable logging  to file
+    logFilePath: "path/to/log.txt"      # Log location
+
+  
