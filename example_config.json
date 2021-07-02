@@ -1,7 +1,0 @@
-{
-    "defaultPrefix":"rm!",
-    "dbUrl":"mongodb://<database_url>/RoleMan",
-    "API_TOKEN":"<token goes here>",
-    "DB_USER":"<Mongodb user for the specified tabe (roleman by default)>",
-    "DB_PASSWORD":"<Password for auth>"
-}
