@@ -16,10 +16,13 @@ class help(commands.Cog):
     
     @commands.command()
     async def help(self, ctx, *args):
+        embed=False
         prefix = self.bot.command_prefix
         if (args) :
             command = self.bot.get_cog(args[0])
-            if (not command.forbidden):
+            if not (command):
+                pass
+            elif (not command.forbidden):
                 embed=lib.embed(
                     title=command.qualified_name,
                     description=command.description,
@@ -35,8 +38,15 @@ class help(commands.Cog):
                 title="List of commands:",
                 sections=cogs,
                 footer=f"Use {self.bot.command_prefix}help <command> to get more specific usage information."
-            )            
+            )
+        if not (embed):   
+            embed=lib.embed(
+                title="This command does not exist",
+                description=f"Try {self.bot.command_prefix}help to see a list of available commands."
+            )       
         await ctx.send(embed=embed)
+
+
 
 def setup(bot):
     bot.add_cog(help(bot))
