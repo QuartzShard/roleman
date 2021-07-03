@@ -31,7 +31,11 @@ class roleManBot(commands.Bot):
         lib.log('--------------------------------')
 
     async def on_command_error(self, ctx, err):
-        embed=discord.Embed(title="Error running command:", description=err,colour=discord.Colour.red())
+        embed=lib.embed(
+            title="Error running command:",
+            description=err.args[0],
+            colour=discord.Colour.red()
+        )
         await ctx.send(embed=embed)
 
 ## Create an instance of the bot

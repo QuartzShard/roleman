@@ -1,3 +1,2 @@
-from .common import log, cfg, msgEmbed
+from .common import log, cfg, embed, hr
 from . import role
-hr='~~- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -~~'

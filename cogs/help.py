@@ -20,15 +20,22 @@ class help(commands.Cog):
         if (args) :
             command = self.bot.get_cog(args[0])
             if (not command.forbidden):
-                usage = command.usage
-                embed=discord.Embed(title=command.qualified_name, description=command.description)
-                embed.add_field(name="Usage",value=command.usage)
+                embed=lib.embed(
+                    title=command.qualified_name,
+                    description=command.description,
+                    sections=[("Usage",command.usage)]
+                )
         else:
-            embed=discord.Embed(title="Command list:")
+            cogs = []
             for cog in self.bot.cogs:
-                get_cog = self.bot.get_cog
-                if (not get_cog(cog).forbidden):
-                    embed.add_field(name=lib.hr,value=f"**{cog}**: {get_cog(cog).description}",inline=False)
+                cog = self.bot.get_cog(cog)
+                if (not cog.forbidden):
+                    cogs.append((cog.qualified_name,cog.description))
+            embed=lib.embed(
+                title="List of commands:",
+                sections=cogs,
+                footer=f"Use {self.bot.command_prefix}help <command> to get more specific usage information."
+            )            
         await ctx.send(embed=embed)
 
 def setup(bot):
