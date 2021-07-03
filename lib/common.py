@@ -1,5 +1,6 @@
 import datetime
 import yaml
+import discord
 
 with open("config.yaml", "r") as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
@@ -11,3 +12,8 @@ def log(event):
     if cfg['options']['logging']['logToFile']:
         with open(cfg['options']['logging']['logFilePath'],"a") as logFile:
             logFile.writeline(f'[{now}]:{event}')
+
+def msgEmbed(title="",body=""):
+    embed = discord.Embed(title=title,body=body)
+    return embed
+
