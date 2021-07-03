@@ -11,7 +11,7 @@ def log(event):
         print(f'[{now}]:{event}')
     if cfg['options']['logging']['logToFile']:
         with open(cfg['options']['logging']['logFilePath'],"a") as logFile:
-            logFile.writeline(f'[{now}]:{event}')
+            logFile.write(f'[{now}]:{event}')
 
 def msgEmbed(title="",body=""):
     embed = discord.Embed(title=title,body=body)

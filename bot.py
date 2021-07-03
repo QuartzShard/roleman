@@ -16,18 +16,23 @@ class roleManBot(commands.Bot):
 
         ## Load Cogs
         for file in os.listdir("./cogs"):
-            if file.endswith(".py"):
+            if file.endswith(".py") and not (file == "help.py" or file == "about.py"):
                 name = file[:-3]
                 self.load_extension(f"cogs.{name}")
 
 
     async def on_ready(self):
+        self.load_extension("cogs.help")
+        self.load_extension("cogs.about")
         lib.log('--------------------------------')
         lib.log('Bot Ready.')
         lib.log(f'Logged in as {self.user.name}')
         lib.log(f'User ID: {self.user.id}')
         lib.log('--------------------------------')
 
+    async def on_command_error(self, ctx, err):
+        embed=discord.Embed(title="Error running command:", description=err,colour=discord.Colour.red())
+        await ctx.send(embed=embed)
 
 ## Create an instance of the bot
 botClient = roleManBot(lib.cfg['options']['prefix'], intents=intents)

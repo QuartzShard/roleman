@@ -6,7 +6,10 @@ from discord.ext import commands, tasks
 class about(commands.Cog):
     def __init__(self,bot):
         self.bot = bot
-        self.usage = f"{bot.command_prefix}about"
+        self.description = f"Display information about {self.bot.user.name}"
+        self.usage = f"""
+        {self.bot.command_prefix}about
+        """
         self.forbidden = False
         
     

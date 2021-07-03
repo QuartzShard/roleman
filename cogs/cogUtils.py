@@ -7,7 +7,6 @@ class cogUtils(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.forbidden = True
-        self.usage=f"{bot.command_prefix}load/reload/unload <module>"
     
     ## Reload a cog
     @commands.command()
