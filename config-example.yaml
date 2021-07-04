@@ -1,17 +1,37 @@
-# Discord API settings
+#Discord API settings
 discord:
-  token: "TOKEN"                        # Provide your token here
+  #Provide your login token
+  token: "TOKEN"      
+  #Manage requested intents                  
   intents:        
-    members: True                       # Don't touch this unless you know what you're doing
+    members: True
 
-# Bot settings        
-options: 
-  prefix: "!" #Bot Command Prefix
+#Bot settings        
+options:
+  #Bot Command Prefix 
+  prefix: "!" 
+  #Message embed settings
+  embed:
+    colour:
+      #RGB values for colour presets
+      default:
+        r: 0xb4
+        g: 0xeb
+        b: 0xeb
+      error:
+        r: 0xff
+        g: 0x00
+        b: 0x00
+      #Thumbnail image URL
+      thumbnail: "https://cdn.discordapp.com/avatars/700843606923149352/2e2840d61258ef8a5cc976571cb3851a.png?size=256"
+  #Logging behaviour
   logging:                              
-    # WARNING! if you diable all logging and something breaks, fixing it will be very difficult. 
-    # Recommend you leave console logging enabled as a minimum
-    logToConsole: True                  # Enable logging to console
-    logToFile: False                    # Enable logging  to file
-    logFilePath: "path/to/log.txt"      # Log location
+    #WARNING! if you disable all logging and something breaks, fixing it will be very difficult. 
+    #Recommend you leave console logging enabled as a minimum
+    #Enable logging to console
+    logToConsole: True       
+    #Enable logging to a file
+    logToFile: False
+    logFilePath: "path/to/log.txt"
 
   

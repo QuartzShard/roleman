@@ -1,11 +1,14 @@
 import datetime
 import yaml
-import discord
+from discord import Embed, Color, Colour
 
-hr='~~- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -~~'
-
+## Exported values
 with open("config.yaml", "r") as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
+hr='~~- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -~~'
+defaultColour = Colour.from_rgb(**cfg['options']['embed']['colour']['default'])
+errorColour = Colour.from_rgb(**cfg['options']['embed']['colour']['error'])
+
 
 def log(event):
     now = datetime.datetime.now().strftime("%d,%m,%y %H:%M:%S")
@@ -27,7 +30,7 @@ def embed(**kwargs):
     thumbnail - boolean to display roleman thumbnail
     footer - Text to put at the bottom of the embed
     """
-    embed=discord.Embed()
+    embed=Embed()
     if ("title" in kwargs.keys()):
         embed.title = kwargs["title"]
     if ("description" in kwargs.keys()):
@@ -43,12 +46,12 @@ def embed(**kwargs):
     elif ("color" in kwargs.keys()):
         embed.color = kwargs["color"] 
     else:
-        embed.colour = discord.Colour.from_rgb(0xb4,0xeb,0xeb)
+        embed.colour = defaultColour
     if ("url" in kwargs.keys()):
         embed.url = kwargs["url"]
     if ("thumbnail" in kwargs.keys()):
         if kwargs["thumbnail"]:
-            embed.set_image(url="https://cdn.discordapp.com/avatars/700843606923149352/2e2840d61258ef8a5cc976571cb3851a.png?size=256")
+            embed.set_image(url=cfg['options']['embed']['thumbnail'])
     if ("footer" in kwargs.keys()):
         embed.set_footer(text=kwargs["footer"])
     return embed

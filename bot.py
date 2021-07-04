@@ -34,7 +34,7 @@ class roleManBot(commands.Bot):
         embed=lib.embed(
             title="Error running command:",
             description=err.args[0],
-            colour=discord.Colour.red()
+            colour=lib.errorColour
         )
         await ctx.send(embed=embed)
 

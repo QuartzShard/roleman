@@ -1,2 +1,2 @@
-from .common import log, cfg, embed, hr
+from .common import *
 from . import role
