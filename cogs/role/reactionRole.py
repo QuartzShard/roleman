@@ -18,12 +18,13 @@ class reactionRole(commands.Cog):
 
     ## Callable command to set up reaction role.
     @commands.command()
+    @commands.has_guild_permissions(administrator=True)
     async def reactionRole(self, ctx, *args):
         guild = ctx.guild
 
         ## Check for existing guild config
         try:
-            guildconf = self.bot.guildConf[guild.id]
+            guildconf = self.bot.guildConf[str(guild.id)]
         except KeyError:
             self.bot.guildConf[guild.id] = {
                 "selfrole":{}
@@ -57,16 +58,42 @@ class reactionRole(commands.Cog):
         for emoji in guildconf["selfrole"].keys():
             if emoji != "msgID":
                 await reply.add_reaction(emoji)
+
+        ## Delete call
+        await ctx.message.delete()
         
     ## Listner to add roles to users
     @commands.Cog.listener()
-    async def on_reaction_add(self,ctx, *args):
-        pass
+    async def on_raw_reaction_add(self,ctx, *args):
+        if ctx.user_id == self.bot.user.id:
+            return
+        guild = self.bot.get_guild(ctx.guild_id)
+        ## Check for existing guild config
+        try:
+            guildconf = self.bot.guildConf[str(guild.id)]
+        except KeyError:
+            return    
+        if ctx.message_id != guildconf["selfrole"]["msgID"][1]:
+            return
+        role = await lib.role.getRole(guildconf["selfrole"][ctx.emoji.name],guild)
+        await ctx.member.add_roles(role)
+
 
     ## Listener to remove roles from user  
     @commands.Cog.listener()
-    async def on_reaction_remove(self, ctx, *args):
-        pass
+    async def on_raw_reaction_remove(self, ctx, *args):
+        if ctx.user_id == self.bot.user.id:
+            return
+        guild = self.bot.get_guild(ctx.guild_id)
+        ## Check for existing guild config
+        try:
+            guildconf = self.bot.guildConf[str(guild.id)]
+        except KeyError:
+            return    
+        if ctx.message_id != guildconf["selfrole"]["msgID"][1]:
+            return
+        role = await lib.role.getRole(guildconf["selfrole"][ctx.emoji.name],guild)
+        await guild.get_member(ctx.user_id).remove_roles(role)
 
     ## Hiden force json save for debug  
     @commands.command()
