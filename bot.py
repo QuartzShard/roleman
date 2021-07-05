@@ -1,5 +1,6 @@
 ## Initialization
 import os
+import re
 import discord
 import lib 
 from discord.ext import commands
@@ -21,12 +22,13 @@ class roleManBot(commands.Bot):
                 for file in files:
                     if file.endswith(".py") and not (file == "help.py" or file == "about.py"):
                         name = file[:-3]
-                        self.load_extension(f"cogs.{name}")
+                        parent = ".".join(re.findall(r"\w+",root))
+                        self.load_extension(f"{parent}.{name}")
 
     
     async def on_ready(self):
-        self.load_extension("cogs.help")
-        self.load_extension("cogs.about")
+        self.load_extension("cogs.utils.help")
+        self.load_extension("cogs.utils.about")
         lib.log('--------------------------------')
         lib.log('Bot Ready.')
         lib.log(f'Logged in as {self.user.name}')
