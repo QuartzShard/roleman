@@ -3,6 +3,7 @@ import os
 import discord
 import lib 
 from discord.ext import commands
+from discord_slash import SlashCommand
 
 ## Constants and Config
 intents = discord.Intents.default()
@@ -15,12 +16,14 @@ class roleManBot(commands.Bot):
         self.remove_command('help')
 
         ## Load Cogs
-        for file in os.listdir("./cogs"):
-            if file.endswith(".py") and not (file == "help.py" or file == "about.py"):
-                name = file[:-3]
-                self.load_extension(f"cogs.{name}")
+        for root, subdirs, files in os.walk("./cogs"):
+            if not ("__pycache__" in root):
+                for file in files:
+                    if file.endswith(".py") and not (file == "help.py" or file == "about.py"):
+                        name = file[:-3]
+                        self.load_extension(f"cogs.{name}")
 
-
+    
     async def on_ready(self):
         self.load_extension("cogs.help")
         self.load_extension("cogs.about")
@@ -40,4 +43,5 @@ class roleManBot(commands.Bot):
 
 ## Create an instance of the bot
 botClient = roleManBot(lib.cfg['options']['prefix'], intents=intents)
+slash = SlashCommand(botClient,True)
 botClient.run(lib.cfg['discord']['token'])
