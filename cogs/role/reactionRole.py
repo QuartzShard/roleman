@@ -1,6 +1,7 @@
 ## Initialisation
 import lib
 import discord
+import re
 from discord.ext import commands, tasks
 
 ## Define reactionRole cog
@@ -8,6 +9,7 @@ class reactionRole(commands.Cog):
     ## Initialise with help info
     def __init__(self, bot):
         self.bot = bot
+        self.category = re.search(r"cogs\.(\w+)\.",self.__module__).groups()[0]
         self.description = f"Allow users to react to a message to self-assign roles"
         self.usage = f"""
         {self.bot.command_prefix}reactionRole <role name|role ID|@role> <emoji> [<role name|role ID|@role> <emoji>]...
