@@ -5,7 +5,7 @@ from discord import Embed, Color, Colour
 ## Exported values
 with open("config.yaml", "r") as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
-hr='~~- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -~~'
+hr="─────────────────────────────────────────────────"
 defaultColour = Colour.from_rgb(**cfg['options']['embed']['colour']['default'])
 errorColour = Colour.from_rgb(**cfg['options']['embed']['colour']['error'])
 
@@ -40,7 +40,9 @@ def embed(**kwargs):
             embed.add_field(name=elem[0],value=elem[1])
     if ("body" in kwargs.keys()):
         for elem in kwargs["body"]:
-            embed.add_field(name=hr,value=elem)
+            embed.add_field(name=hr,value=elem, inline=False)
+        #now = datetime.datetime.now().strftime("%H:%M")
+        #embed.add_field(name=hr,value=f"Request fulfilled at {now}",inline=False)
     if ("colour" in kwargs.keys()):
         embed.colour = kwargs["colour"]
     elif ("color" in kwargs.keys()):
