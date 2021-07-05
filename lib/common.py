@@ -1,3 +1,4 @@
+## Initialisation
 import datetime
 import yaml
 from discord import Embed, Color, Colour
@@ -9,7 +10,7 @@ hr="─────────────────────────�
 defaultColour = Colour.from_rgb(**cfg['options']['embed']['colour']['default'])
 errorColour = Colour.from_rgb(**cfg['options']['embed']['colour']['error'])
 
-
+## Log to console and/or file with timestamp, based on config contents
 def log(event):
     now = datetime.datetime.now().strftime("%d,%m,%y %H:%M:%S")
     if cfg['options']['logging']['logToConsole']:
@@ -18,6 +19,7 @@ def log(event):
         with open(cfg['options']['logging']['logFilePath'],"a") as logFile:
             logFile.write(f'[{now}]:{event}')
 
+## Helper function for using message embeds
 def embed(**kwargs):
     """
     Created an embed from the provided details
@@ -30,7 +32,10 @@ def embed(**kwargs):
     thumbnail - boolean to display roleman thumbnail
     footer - Text to put at the bottom of the embed
     """
+    
     embed=Embed()
+
+    ## Check for present kwargs and edit embed accordingly
     if ("title" in kwargs.keys()):
         embed.title = kwargs["title"]
     if ("description" in kwargs.keys()):

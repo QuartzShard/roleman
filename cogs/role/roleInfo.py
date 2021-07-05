@@ -1,10 +1,12 @@
-## Initialization
+## Initialisation
 import lib
 import discord
 from discord.ext import commands, tasks
 from discord_slash import cog_ext
 
+## Define roleInfo cog
 class roleInfo(commands.Cog):
+    ## Initialise with help info
     def __init__(self,bot):
         self.bot = bot
         self.description = f"Display information about a given role"
@@ -15,10 +17,13 @@ class roleInfo(commands.Cog):
         """
         self.forbidden = False
 
+    ## Callable command to provide information about a given role
     #@cog_ext.cog_slash(name="roleInfo",guild_ids=[860454052264280084])
     @commands.command()
     async def roleInfo(self, ctx, target):
+        ## Fetch role
         role = await lib.role.getRole(target,ctx.guild)
+        ## Populate embed with info
         if (role):
             holders = role.members
             embed=lib.embed(

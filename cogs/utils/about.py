@@ -1,9 +1,11 @@
-## Initialization
+## Initialisation
 import lib
 import discord
 from discord.ext import commands, tasks
 
+## Define about cog
 class about(commands.Cog):
+    ## Initialise with help info
     def __init__(self,bot):
         self.bot = bot
         self.description = f"Display information about {self.bot.user.name}"
@@ -12,12 +14,12 @@ class about(commands.Cog):
         """
         self.forbidden = False
         
-    
+    ## Callable command to provide info about bot
     @commands.command()
     async def about(self, ctx, *command):
         embed=lib.embed(
             title="About Roleman",
-            description="A modular rike-management bot. Find us on github!",
+            description="A modular role-management bot. Find us on github!",
             url="https://github.com/QuartShard/roleman",
             thumbnail=True
         )

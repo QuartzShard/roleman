@@ -1,9 +1,11 @@
-## Initialization
+## Initialisation
 import lib
 import discord
 from discord.ext import commands, tasks
 
+## Define help cog
 class help(commands.Cog):
+    ## Initialose with help info
     def __init__(self,bot):
         self.bot = bot
         self.description = f"Display help about {self.bot.user.name}'s commands"
@@ -13,15 +15,17 @@ class help(commands.Cog):
         """
         self.forbidden = False
         
-    
+    ## Callable command to provide user help with command usage
     @commands.command()
     async def help(self, ctx, *args):
         embed=False
         prefix = self.bot.command_prefix
+        ## Provide specific help, or general command list
         if (args) :
             command = self.bot.get_cog(args[0])
             if not (command):
                 pass
+            ## Gather usage info about command
             elif (not command.forbidden):
                 embed=lib.embed(
                     title=command.qualified_name,
@@ -34,6 +38,7 @@ class help(commands.Cog):
                 cog = self.bot.get_cog(cog)
                 if (not cog.forbidden):
                     cogs.append((cog.qualified_name,cog.description))
+            ## Display list of commands and desceriptions
             embed=lib.embed(
                 title="List of commands:",
                 sections=cogs,

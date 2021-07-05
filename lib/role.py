@@ -1,5 +1,7 @@
+## Initialisation
 import discord
 
+## Get a role objet given a name, mention or id and a guild
 async def getRole(nameOrID, guild):
     if nameOrID.isdigit():
         return guild.get_role(int(nameOrID))
