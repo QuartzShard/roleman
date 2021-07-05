@@ -1,7 +1,7 @@
 ## Initialisation
 import lib
 import discord
-import re
+
 from discord.ext import commands, tasks
 from discord_slash import cog_ext
 
@@ -10,7 +10,7 @@ class roleInfo(commands.Cog):
     ## Initialise with help info
     def __init__(self,bot):
         self.bot = bot       
-        self.category = re.search(r"cogs\.(\w+)\.",self.__module__).groups()[0]
+        self.category = lib.getCategory(self.__module__)
         self.description = f"Display information about a given role"
         self.usage = f"""
         {self.bot.command_prefix}roleInfo <role name>

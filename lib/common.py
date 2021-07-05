@@ -1,5 +1,6 @@
 ## Initialisation
 import datetime
+import re
 import yaml
 from discord import Embed, Color, Colour
 
@@ -63,3 +64,9 @@ def embed(**kwargs):
         embed.set_footer(text=kwargs["footer"])
     return embed
 
+def getCategory(module):
+    try:
+        category = re.search(r"cogs\.(\w+)\.",module).groups()[0]
+    except AttributeError:
+        category = "Misc"
+    return category

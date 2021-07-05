@@ -1,7 +1,7 @@
 ## Initialisation
 import lib
 import discord
-import re
+
 from discord.ext import commands, tasks
 
 ## Define help cog
@@ -9,7 +9,7 @@ class help(commands.Cog):
     ## Initialose with help info
     def __init__(self,bot):
         self.bot = bot
-        self.category = re.search(r"cogs\.(\w+)\.",self.__module__).groups()[0]
+        self.category = lib.getCategory(self.__module__)
         self.description = f"Display help about {self.bot.user.name}'s commands"
         self.usage = f"""
         {self.bot.command_prefix}help
