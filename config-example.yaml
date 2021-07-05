@@ -28,7 +28,7 @@ options:
         g: 0x00
         b: 0x00
       #Thumbnail image URL
-      thumbnail: "https://cdn.discordapp.com/avatars/700843606923149352/2e2840d61258ef8a5cc976571cb3851a.png?size=256"
+    thumbnail: "https://cdn.discordapp.com/avatars/700843606923149352/2e2840d61258ef8a5cc976571cb3851a.png?size=256"
   #Logging behaviour
   logging:                              
     #WARNING! if you disable all logging and something breaks, fixing it will be very difficult. 
