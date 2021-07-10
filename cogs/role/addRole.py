@@ -19,7 +19,7 @@ class addRole(commands.Cog):
         self.forbidden = False
 
     ## Callable command
-    @commands.command()
+    @commands.command(aliases=["addRoles"])
     @commands.has_guild_permissions(manage_roles=True)
     @commands.bot_has_guild_permissions(manage_roles=True)
     async def addRole(self,ctx,*args):
@@ -53,7 +53,12 @@ class addRole(commands.Cog):
 
         for role in resRoles:
             if role > ctx.author.top_role:
-                return
+                embed = lib.embed(
+                    title="Permissions Error",
+                    description="You tried to use addRole to grant a role that is higher than your current top role.",
+                    colour=lib.errorColour
+                )
+                return await ctx.send(embed=embed)
 
         resUsers = []
         for user in users:
@@ -68,7 +73,6 @@ class addRole(commands.Cog):
 
         for user in resUsers:
             await user.add_roles(*resRoles)
-            discord.Member.add_roles()
         
         embed = lib.embed(
                 title="Success!",
