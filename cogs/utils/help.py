@@ -18,21 +18,23 @@ class help(commands.Cog):
         self.forbidden = False
         
     ## Callable command to provide user help with command usage
-    @commands.command()
+    @commands.command(aliases=[])
     async def help(self, ctx, *args):
         embed=False
         prefix = self.bot.command_prefix
         ## Provide specific help, or general command list
         if (args) :
-            command = self.bot.get_cog(args[0])
-            if not (command):
+            cog = self.bot.get_cog(args[0])
+            command = self.bot.get_command(args[0])
+            if not (cog):
                 pass
             ## Gather usage info about command
-            elif (not command.forbidden):
+            elif (not cog.forbidden):
                 embed=lib.embed(
-                    title=command.qualified_name,
-                    description=command.description,
-                    sections=[("Usage",command.usage),("Category",command.category)]
+                    title=cog.qualified_name,
+                    description=cog.description,
+                    sections=[("Usage",cog.usage),("Category",cog.category)],
+                    footer=f'Aliases: {", ".join(command.aliases)}'
                 )
         else:
             cogs = {}
