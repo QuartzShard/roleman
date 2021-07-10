@@ -10,6 +10,7 @@ async def getRole(nameOrID, guild):
             for role in guild.roles:
                 if role.name == nameOrID or role.mention == nameOrID:
                     return role
+            return None
     elif type(nameOrID) is int:
         return guild.get_role(nameOrID)
     else:
