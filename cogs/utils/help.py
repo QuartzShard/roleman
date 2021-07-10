@@ -33,9 +33,10 @@ class help(commands.Cog):
                 embed=lib.embed(
                     title=cog.qualified_name,
                     description=cog.description,
-                    sections=[("Usage",cog.usage),("Category",cog.category)],
-                    footer=f'Aliases: {", ".join(command.aliases)}'
+                    sections=[("Usage",cog.usage),("Category",cog.category)]
                 )
+                if (command.aliases):
+                    embed.set_footer(text=f'Aliases: {", ".join(command.aliases)}')
         else:
             cogs = {}
             for cog in self.bot.cogs:
