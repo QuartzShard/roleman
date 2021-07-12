@@ -14,7 +14,7 @@ class CMD_CLASS(commands.Cog):
         self.category = category.getCategory(self.__module__)
         self.description = 'Command description'
         self.usage = f"""
-        {config.cfg['options']['prefix']}CMD_WORD <usage>
+        {self.bot.command_prefix}CMD_WORD <usage>
         """
 
     ## Command defining
