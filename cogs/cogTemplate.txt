@@ -10,12 +10,12 @@ class CMD_CLASS(commands.Cog):
         self.bot = bot
 
         ## Help stuff
-        self.hidden = False
-        self.category = category.getCategory(self.__module__)
+        self.category = lib.getCategory(self.__module__)
         self.description = 'Command description'
         self.usage = f"""
         {self.bot.command_prefix}CMD_WORD <usage>
         """
+        self.forbidden = False
 
     ## Command defining
     @commands.command()
