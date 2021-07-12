@@ -18,7 +18,7 @@ class help(commands.Cog):
         self.forbidden = False
         
     ## Callable command to provide user help with command usage
-    @commands.command(aliases=[])
+    @commands.command(aliases=["?"])
     async def help(self, ctx, *args):
         embed=False
         prefix = self.bot.command_prefix

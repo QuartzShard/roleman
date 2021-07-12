@@ -18,7 +18,7 @@ class joinRole(commands.Cog):
         self.forbidden = False
 
     ## Define joinRole callable
-    @commands.command()
+    @commands.command(aliases=["joinRoles"])
     @commands.has_guild_permissions(administrator=True)
     async def joinRole(self, ctx, *roles):
         resRoles = []

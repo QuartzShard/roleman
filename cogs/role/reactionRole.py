@@ -17,7 +17,7 @@ class reactionRole(commands.Cog):
         self.forbidden = False
 
     ## Callable command to set up reaction role.
-    @commands.command()
+    @commands.command(aliases=["reactionRoles"])
     @commands.has_guild_permissions(administrator=True)
     async def reactionRole(self, ctx, *args):
         guild = ctx.guild
