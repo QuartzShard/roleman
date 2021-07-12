@@ -26,10 +26,11 @@ class reactionRole(commands.Cog):
         try:
             guildconf = self.bot.guildConf[str(guild.id)]
         except KeyError:
-            self.bot.guildConf[guild.id] = {
-                "selfrole":{}
+            self.bot.guildConf[str(guild.id)] = {
+                "selfrole":{},
+                "joinrole":[]
             }
-            guildconf = self.bot.guildConf[guild.id]
+            guildconf = self.bot.guildConf[str(guild.id)]
 
         ## Check for existing reactionRole message, and remove it if present
         if "msgID" in guildconf["selfrole"].keys():

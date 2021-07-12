@@ -52,13 +52,13 @@ class roleManBot(commands.Bot):
 
     ## Setup guildconf for new guild
     async def on_guild_join(self, guild):
-        self.guildConf[guild.id] = {
+        self.guildConf[str(guild.id)] = {
             "selfrole":{}
         }
     
     ## Dump guildconf on guild remove
     async def on_guild_remove(self,guild):
-        del self.guildConf[guild.id]
+        del self.guildConf[str(guild.id)]
     
     ## Inform user of error
     async def on_command_error(self, ctx, err):
