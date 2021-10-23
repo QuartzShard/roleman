@@ -76,7 +76,10 @@ class reactionRole(commands.Cog):
             return    
         if ctx.message_id != guildconf["selfrole"]["msgID"][1]:
             return
-        role = await lib.role.getRole(guildconf["selfrole"][ctx.emoji.name],guild)
+        try:
+            role = await lib.role.getRole(guildconf["selfrole"][ctx.emoji.name],guild)
+        except KeyError:
+            role = await lib.role.getRole(guildconf["selfrole"][f"<:{ctx.emoji.name}:{ctx.emoji.id}>"],guild)
         await ctx.member.add_roles(role)
 
 
@@ -93,7 +96,10 @@ class reactionRole(commands.Cog):
             return    
         if ctx.message_id != guildconf["selfrole"]["msgID"][1]:
             return
-        role = await lib.role.getRole(guildconf["selfrole"][ctx.emoji.name],guild)
+        try:
+            role = await lib.role.getRole(guildconf["selfrole"][ctx.emoji.name],guild)
+        except KeyError:
+            role = await lib.role.getRole(guildconf["selfrole"][f"<:{ctx.emoji.name}:{ctx.emoji.id}>"],guild)
         await guild.get_member(ctx.user_id).remove_roles(role)
 
     ## Hiden force json save for debug  
