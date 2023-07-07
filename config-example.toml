@@ -1,0 +1,24 @@
+#####################
+# Bot Configuration #
+#####################
+
+[test]
+#Set to the ID of your test server to register commands to it, rather than global
+test_guild_id=000000000000000000
+
+#Discord API settings. Don't add or remove any of these.
+[discord]
+token="TOKEN"     
+#Manage requested intents                  
+[discord.intents]        
+members = false #Change to true if the bot needs to know about users
+guilds = true #Leave this as true unless you know you don't need it
+reactions = false #Change this to true if your bot needs to interact with message reactions
+
+#About info
+#Describe your bot!
+[about]
+title = "boilerBOT"
+description = "a bot boilerplate. Find us on github!"
+url = "https://github.com/quartzshard"
+

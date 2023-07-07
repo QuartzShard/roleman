@@ -1,5 +1,6 @@
 .vscode
-config.yaml
-__pycache__/
-test.py
-guildConf.json
+config.toml
+
+# Added by cargo
+
+/target
