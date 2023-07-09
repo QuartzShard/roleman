@@ -16,7 +16,9 @@ async fn main() {
             commands: vec![
                 commands::misc::ping(),
                 commands::role::add_role_to_list(),
+                commands::role::remove_role_from_list(),
                 commands::role::get_role_list(),
+                commands::role::clear_role_list(),
                 commands::role::role_menu(),
                 commands::role::role_menu_context_user(),
             ],
@@ -31,16 +33,10 @@ async fn main() {
                 let handle = match event {
                     poise::Event::Message { new_message } => {
                         if new_message.author.id == framework.bot_id
-                            && (new_message.content.split_ascii_whitespace().next().unwrap()
-                                == "Added")
-                            || (new_message.content.split_ascii_whitespace().next().unwrap()
-                                == "Removed")
+                            && !(new_message.content.contains("Select a role..."))
                         {
                             debug!("Message Event: {:?}", new_message);
-                            tokio::spawn(commands::role::cleanup(
-                                ctx.http.clone(),
-                                new_message.to_owned(),
-                            ))
+                            tokio::spawn(roleman::cleanup(ctx.http.clone(), new_message.to_owned()))
                         } else {
                             tokio::spawn(async {
                                 tokio::time::sleep(Duration::from_secs(0)).await;
@@ -76,9 +72,12 @@ async fn main() {
                     poise::builtins::register_globally(ctx, &framework.options().commands).await?;
                 }
                 info!("Logged in as: {}", _ready.user.name);
-                let map: HashMap<serenity::GuildId, Vec<roleman::RoleInfo>> = HashMap::new();
+                let rolemap: HashMap<serenity::GuildId, roleman::RoleInfo> = HashMap::new();
+                let menumap: HashMap<serenity::GuildId, Option<roleman::MessageInfo>> =
+                    HashMap::new();
                 Ok(Data {
-                    allowed_roles: std::sync::Mutex::new(map),
+                    allowed_roles: std::sync::Mutex::new(rolemap),
+                    active_menus: std::sync::Mutex::new(menumap),
                 })
             })
         });
