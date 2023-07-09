@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::time::Duration;
 
 use poise::serenity_prelude as serenity;
 use roleman::{commands, config, Data};
@@ -25,6 +26,37 @@ async fn main() {
                         error!("Error while handling error: {}", e);
                     }
                 })
+            },
+            event_handler: move |ctx, event, framework, _data| {
+                let handle = match event {
+                    poise::Event::Message { new_message } => {
+                        if new_message.author.id == framework.bot_id
+                            && (new_message.content.split_ascii_whitespace().next().unwrap()
+                                == "Added")
+                            || (new_message.content.split_ascii_whitespace().next().unwrap()
+                                == "Removed")
+                        {
+                            info!("Message Event: {:?}", new_message);
+                            // new_message.delete(&ctx);
+
+                            tokio::spawn(commands::role::cleanup(
+                                ctx.http.clone(),
+                                new_message.to_owned(),
+                            ))
+                        } else {
+                            tokio::spawn(async {
+                                tokio::time::sleep(Duration::from_secs(0)).await;
+                                Ok(())
+                            })
+                        }
+                    }
+                    _ => tokio::spawn(async {
+                        tokio::time::sleep(Duration::from_secs(0)).await;
+                        Ok(())
+                    }),
+                };
+                handle.is_finished();
+                Box::pin(async move { Ok(()) })
             },
             ..Default::default()
         })

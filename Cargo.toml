@@ -9,7 +9,7 @@ edition = "2021"
 poise = "0.5.5"
 serde = { version = "1.0.167", features = ["derive", "serde_derive"] }
 serde_derive = "1.0.167"
-tokio = { version = "1.29.1", features = ["rt-multi-thread", "tracing"] }
+tokio = { version = "1.29.1", features = ["rt-multi-thread", "tracing", "signal"] }
 toml = "0.7.6"
 tracing = "0.1.37"
 tracing-subscriber = "0.3.17"
