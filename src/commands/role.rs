@@ -1,6 +1,5 @@
 use crate::{error::RoleManError, CmdContext, CmdResult};
 use poise::serenity_prelude::{self as serenity, CacheHttp};
-use std::sync::Arc;
 use std::time::Duration;
 use tracing::info;
 
@@ -176,7 +175,7 @@ pub async fn role_menu_internal(ctx: CmdContext<'_>) -> CmdResult<()> {
             info!("Removing");
             member.remove_role(ctx, role_id).await?;
             let msg = mci.message.clone();
-            let reply = msg
+            let _reply = msg
                 .reply(
                     ctx,
                     format!("Removed <@&{}> from <@{}>", role_id, member.user.id),
@@ -186,13 +185,11 @@ pub async fn role_menu_internal(ctx: CmdContext<'_>) -> CmdResult<()> {
                 i.kind(serenity::InteractionResponseType::DeferredUpdateMessage)
             })
             .await?;
-            cleanup(ctx, reply).await?;
-            // remove_role_from_user(ctx, role_id, &mci, member).await?;
         } else {
             info!("Adding");
             member.add_role(ctx, role_id).await?;
             let msg = mci.message.clone();
-            let reply = msg
+            let _reply = msg
                 .reply(
                     ctx,
                     format!("Added <@&{}> to <@{}>", role_id, member.user.id),
@@ -202,8 +199,6 @@ pub async fn role_menu_internal(ctx: CmdContext<'_>) -> CmdResult<()> {
                 i.kind(serenity::InteractionResponseType::DeferredUpdateMessage)
             })
             .await?;
-            cleanup(ctx, reply).await?;
-            // assign_role_to_user(ctx, role_id, &mci, member).await?;
         }
     }
 
@@ -223,40 +218,3 @@ pub async fn role_menu(ctx: CmdContext<'_>) -> CmdResult<()> {
 pub async fn role_menu_context_user(ctx: CmdContext<'_>, _msg: serenity::User) -> CmdResult<()> {
     role_menu_internal(ctx).await
 }
-
-// pub async fn assign_role_to_user(
-//     ctx: CmdContext<'_>,
-//     id: serenity::RoleId,
-//     mci: &Arc<serenity::MessageComponentInteraction>,
-//     mut user: serenity::Member,
-// ) -> CmdResult<()> {
-//     user.add_role(ctx, id).await?;
-//     let mut msg = mci.message.clone();
-//     msg.edit(ctx, |m| {
-//         m.content(format!("Removed <@&{}> from <@{}>", id, user.user.id))
-//     })
-//     .await?;
-//     mci.create_interaction_response(ctx, |i| {
-//         i.kind(serenity::InteractionResponseType::DeferredUpdateMessage)
-//     })
-//     .await?;
-//     Ok(())
-// }
-// pub async fn remove_role_from_user(
-//     ctx: CmdContext<'_>,
-//     id: serenity::RoleId,
-//     mci: &Arc<serenity::MessageComponentInteraction>,
-//     mut user: serenity::Member,
-// ) -> CmdResult<()> {
-//     user.remove_role(ctx, id).await?;
-//     let mut msg = mci.message.clone();
-//     msg.edit(ctx, |m| {
-//         m.content(format!("Removed <@&{}> from <@{}>", id, user.user.id))
-//     })
-//     .await?;
-//     mci.create_interaction_response(ctx, |i| {
-//         i.kind(serenity::InteractionResponseType::DeferredUpdateMessage)
-//     })
-//     .await?;
-//     Ok(())
-// }
