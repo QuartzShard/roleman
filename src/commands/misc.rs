@@ -1,6 +1,6 @@
 use crate::{CmdContext, CmdResult};
 
-/// Pong!
+/// Pong
 #[poise::command(slash_command)]
 pub async fn ping(ctx: CmdContext<'_>) -> CmdResult<()> {
     let response = format!("Pong!");
