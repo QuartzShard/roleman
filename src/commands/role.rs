@@ -1,7 +1,7 @@
 use crate::{error::RoleManError, CmdContext, CmdResult};
 use poise::serenity_prelude::{self as serenity, CacheHttp};
 use std::time::Duration;
-use tracing::info;
+use tracing::{debug, warn};
 
 /// Adds a role to the list of self-assignable roles
 #[poise::command(slash_command, guild_only, required_permissions = "MANAGE_ROLES")]
@@ -26,7 +26,6 @@ pub async fn add_role_to_list(
         ))));
     }
 
-    info!("{:?}", ctx.data());
     let response: String;
     // Mutex Lock scope.
     {
@@ -34,7 +33,6 @@ pub async fn add_role_to_list(
             Ok(r) => r,
             Err(_) => return Err(Box::new(RoleManError::DataError)),
         };
-        info!("{:?}", guild_roles_map);
         let guild_id = match ctx.guild_id() {
             Some(id) => id,
             None => {
@@ -47,14 +45,12 @@ pub async fn add_role_to_list(
             Some(r) => r.clone(),
             None => Vec::new(),
         };
-        info!("{:?}", roles);
         roles.push(crate::RoleInfo {
             id: role.id.into(),
             name: role.name,
         });
         roles.sort();
         roles.dedup();
-        info!("{:?}", roles);
         guild_roles_map.insert(guild_id, roles);
 
         response = format!("Added <@&{}> to the list", role.id);
@@ -151,10 +147,10 @@ pub async fn role_menu_internal(ctx: CmdContext<'_>) -> CmdResult<()> {
     )
     .await
     {
-        info!("Button Pressed!");
+        debug!("Button Pressed!");
         let role_id: serenity::RoleId = mci.data.custom_id.parse()?;
         if !(ids.contains(&role_id.0)) {
-            info!("Role ID issue: \n{:?}\n{:?}", role_id, ids);
+            warn!("Role ID issue: \n{:?}\n{:?}", role_id, ids);
             continue;
         }
         let mut member = ctx
@@ -163,7 +159,6 @@ pub async fn role_menu_internal(ctx: CmdContext<'_>) -> CmdResult<()> {
             .member(ctx.http(), ctx.author().id)
             .await?;
 
-        info!("{:?}", member);
         if member
             .roles(ctx)
             .unwrap_or(vec![])
@@ -172,7 +167,7 @@ pub async fn role_menu_internal(ctx: CmdContext<'_>) -> CmdResult<()> {
             .collect::<Vec<serenity::RoleId>>()
             .contains(&role_id)
         {
-            info!("Removing");
+            debug!("Removing");
             member.remove_role(ctx, role_id).await?;
             let msg = mci.message.clone();
             let _reply = msg
@@ -186,7 +181,7 @@ pub async fn role_menu_internal(ctx: CmdContext<'_>) -> CmdResult<()> {
             })
             .await?;
         } else {
-            info!("Adding");
+            debug!("Adding");
             member.add_role(ctx, role_id).await?;
             let msg = mci.message.clone();
             let _reply = msg
