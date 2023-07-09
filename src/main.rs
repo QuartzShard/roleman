@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use poise::serenity_prelude as serenity;
 use roleman::{commands, config, Data};
-use tracing::{error, info};
+use tracing::{debug, error, info};
 use tracing_subscriber;
 
 #[tokio::main]
@@ -14,6 +14,7 @@ async fn main() {
         .options(poise::FrameworkOptions {
             commands: vec![
                 commands::misc::ping(),
+                commands::misc::test(),
                 commands::role::add_role_to_list(),
                 commands::role::get_role_list(),
                 commands::role::role_menu(),

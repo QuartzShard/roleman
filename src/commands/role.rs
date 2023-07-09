@@ -1,12 +1,8 @@
 use crate::{error::RoleManError, CmdContext, CmdResult};
-use poise::serenity_prelude as serenity;
+use poise::serenity_prelude::{self as serenity, CacheHttp};
+use std::sync::Arc;
+use std::time::Duration;
 use tracing::info;
-
-#[derive(Debug, poise::Modal)]
-#[allow(dead_code)]
-struct RoleAddModal {
-    role: String,
-}
 
 /// Adds a role to the list of self-assignable roles
 #[poise::command(slash_command, guild_only, required_permissions = "MANAGE_ROLES")]
@@ -100,6 +96,12 @@ pub async fn get_role_list(ctx: CmdContext<'_>) -> CmdResult<()> {
     Ok(())
 }
 
+pub fn id_filter(
+    cci: serenity::CollectComponentInteraction,
+    ids: Vec<u64>,
+) -> serenity::CollectComponentInteraction {
+    cci.filter(move |mci| ids.contains(&mci.data.custom_id.parse().unwrap_or(0)))
+}
 pub async fn role_menu_internal(ctx: CmdContext<'_>) -> CmdResult<()> {
     let rolelist;
     // Mutex lock scope
@@ -123,8 +125,9 @@ pub async fn role_menu_internal(ctx: CmdContext<'_>) -> CmdResult<()> {
     };
     let rolelist_copy = rolelist.clone();
     let rolelist = rolelist.iter();
+
     ctx.send(|msg| {
-        msg.content("Pick your roles: ");
+        msg.content("> Select a role...");
         msg.components(|c| {
             c.create_action_row(|a| {
                 rolelist.for_each(|role| {
@@ -139,38 +142,76 @@ pub async fn role_menu_internal(ctx: CmdContext<'_>) -> CmdResult<()> {
         })
     })
     .await?;
+
     let ids: Vec<u64> = rolelist_copy.clone().iter().map(|r| r.id).collect();
-    loop {
-        let id_i = ids.clone();
-        match serenity::CollectComponentInteraction::new(ctx.serenity_context())
-            .filter(move |mci| {
-                id_i.iter()
-                    .fold(false, |b, i| b | (i.to_string() == mci.data.custom_id))
-            })
-            .await
+
+    while let Some(mci) = id_filter(
+        serenity::CollectComponentInteraction::new(ctx.serenity_context())
+            .channel_id(ctx.channel_id()),
+        ids.clone(),
+    )
+    .await
+    {
+        info!("Button Pressed!");
+        let role_id: serenity::RoleId = mci.data.custom_id.parse()?;
+        if !(ids.contains(&role_id.0)) {
+            info!("Role ID issue: \n{:?}\n{:?}", role_id, ids);
+            continue;
+        }
+        let mut member = ctx
+            .guild()
+            .unwrap()
+            .member(ctx.http(), ctx.author().id)
+            .await?;
+
+        info!("{:?}", member);
+        if member
+            .roles(ctx)
+            .unwrap_or(vec![])
+            .iter()
+            .map(|x| x.id)
+            .collect::<Vec<serenity::RoleId>>()
+            .contains(&role_id)
         {
-            Some(mci) => {
-                assign_role_to_user(
+            info!("Removing");
+            member.remove_role(ctx, role_id).await?;
+            let msg = mci.message.clone();
+            let reply = msg
+                .reply(
                     ctx,
-                    serenity::RoleId::from((mci.data.custom_id).parse::<u64>()?),
-                    match ctx.author_member().await {
-                        Some(m) => m.into_owned(),
-                        None => {
-                            break;
-                        }
-                    },
+                    format!("Removed <@&{}> from <@{}>", role_id, member.user.id),
                 )
                 .await?;
-                mci.create_followup_message(ctx, |m| {
-                    m.content(format!("Added <@&{}>", mci.data.custom_id))
-                })
+            mci.create_interaction_response(ctx, |i| {
+                i.kind(serenity::InteractionResponseType::DeferredUpdateMessage)
+            })
+            .await?;
+            cleanup(ctx, reply).await?;
+            // remove_role_from_user(ctx, role_id, &mci, member).await?;
+        } else {
+            info!("Adding");
+            member.add_role(ctx, role_id).await?;
+            let msg = mci.message.clone();
+            let reply = msg
+                .reply(
+                    ctx,
+                    format!("Added <@&{}> to <@{}>", role_id, member.user.id),
+                )
                 .await?;
-            }
-            None => {
-                break;
-            }
-        };
+            mci.create_interaction_response(ctx, |i| {
+                i.kind(serenity::InteractionResponseType::DeferredUpdateMessage)
+            })
+            .await?;
+            cleanup(ctx, reply).await?;
+            // assign_role_to_user(ctx, role_id, &mci, member).await?;
+        }
     }
+
+    Ok(())
+}
+pub async fn cleanup(ctx: impl serenity::CacheHttp, reply: serenity::Message) -> CmdResult<()> {
+    tokio::time::sleep(Duration::from_secs(3)).await;
+    reply.delete(ctx).await?;
     Ok(())
 }
 /// Bring up the menu of roles.
@@ -183,12 +224,39 @@ pub async fn role_menu_context_user(ctx: CmdContext<'_>, _msg: serenity::User) -
     role_menu_internal(ctx).await
 }
 
-pub async fn assign_role_to_user(
-    ctx: CmdContext<'_>,
-    id: serenity::RoleId,
-    mut user: serenity::Member,
-) -> CmdResult<()> {
-    user.add_role(ctx, id).await?;
-    ctx.say(format!("Added <@&{}>", id)).await?;
-    Ok(())
-}
+// pub async fn assign_role_to_user(
+//     ctx: CmdContext<'_>,
+//     id: serenity::RoleId,
+//     mci: &Arc<serenity::MessageComponentInteraction>,
+//     mut user: serenity::Member,
+// ) -> CmdResult<()> {
+//     user.add_role(ctx, id).await?;
+//     let mut msg = mci.message.clone();
+//     msg.edit(ctx, |m| {
+//         m.content(format!("Removed <@&{}> from <@{}>", id, user.user.id))
+//     })
+//     .await?;
+//     mci.create_interaction_response(ctx, |i| {
+//         i.kind(serenity::InteractionResponseType::DeferredUpdateMessage)
+//     })
+//     .await?;
+//     Ok(())
+// }
+// pub async fn remove_role_from_user(
+//     ctx: CmdContext<'_>,
+//     id: serenity::RoleId,
+//     mci: &Arc<serenity::MessageComponentInteraction>,
+//     mut user: serenity::Member,
+// ) -> CmdResult<()> {
+//     user.remove_role(ctx, id).await?;
+//     let mut msg = mci.message.clone();
+//     msg.edit(ctx, |m| {
+//         m.content(format!("Removed <@&{}> from <@{}>", id, user.user.id))
+//     })
+//     .await?;
+//     mci.create_interaction_response(ctx, |i| {
+//         i.kind(serenity::InteractionResponseType::DeferredUpdateMessage)
+//     })
+//     .await?;
+//     Ok(())
+// }
