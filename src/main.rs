@@ -3,7 +3,7 @@ use std::time::Duration;
 
 use poise::serenity_prelude as serenity;
 use roleman::{commands, config, Data};
-use tracing::{error, info};
+use tracing::{debug, error, info};
 use tracing_subscriber;
 
 #[tokio::main]
@@ -36,9 +36,7 @@ async fn main() {
                             || (new_message.content.split_ascii_whitespace().next().unwrap()
                                 == "Removed")
                         {
-                            info!("Message Event: {:?}", new_message);
-                            // new_message.delete(&ctx);
-
+                            debug!("Message Event: {:?}", new_message);
                             tokio::spawn(commands::role::cleanup(
                                 ctx.http.clone(),
                                 new_message.to_owned(),
